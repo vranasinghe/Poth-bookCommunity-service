@@ -44,7 +44,6 @@ This project is a collaborative effort by 6 members, each handling a core module
 2. Run these commands
    ```bash
    npm install --save-dev nodemon
-   ```bash
    npm run dev
 
 ### 2. Frontend Setup
@@ -53,7 +52,6 @@ This project is a collaborative effort by 6 members, each handling a core module
    cd frontend
 
 2. Run these commands
-   ```bash
    npm install
    ```bash
    npx expo start
