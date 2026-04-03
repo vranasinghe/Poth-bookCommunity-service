@@ -42,9 +42,10 @@ This project is a collaborative effort by 6 members, each handling a core module
    cd backend
 
 2. Run these commands
+   ```bash
    npm install --save-dev nodemon
+   ```bash
    npm run dev
-   ```
 
 ### 2. Frontend Setup
 1. Navigate to the frontend directory:
@@ -52,6 +53,8 @@ This project is a collaborative effort by 6 members, each handling a core module
    cd frontend
 
 2. Run these commands
+   ```bash
    npm install
+   ```bash
    npx expo start
    
