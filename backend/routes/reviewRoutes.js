@@ -4,7 +4,6 @@ const {addReview, getshopReviews, getShopReviews} = require('../controllers/revi
 const {protect} = require('../middlewares/authMiddleware');
 
 router.post('/', protect, addReview);
-
 router.get('/:shopId', getShopReviews);
 
 module.exports = router;
