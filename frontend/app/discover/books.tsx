@@ -64,7 +64,12 @@ export default function DiscoverBooks() {
             />
           )}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} color={Colors.light.primary} />
+            <RefreshControl 
+              refreshing={refreshing} 
+              onRefresh={onRefresh} 
+              colors={[Colors.light.primary]} 
+              tintColor={Colors.light.primary} 
+            />
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
