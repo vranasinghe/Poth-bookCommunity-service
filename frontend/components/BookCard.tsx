@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 
 interface BookCardProps {
+  id?: string;
   title: string;
   author: string;
   rating: number;
@@ -12,7 +13,7 @@ interface BookCardProps {
   width?: number;
 }
 
-export const BookCard = ({ title, author, rating, image, onPress, width = 200 }: BookCardProps) => {
+export const BookCard = ({ id, title, author, rating, image, onPress, width = 200 }: BookCardProps) => {
   return (
     <TouchableOpacity style={[styles.container, { width }]} onPress={onPress}>
       <ImageBackground source={{ uri: image }} style={styles.image} imageStyle={styles.imageStyle}>

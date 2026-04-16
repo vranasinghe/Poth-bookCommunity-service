@@ -1,32 +1,34 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, SafeAreaView, Image } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, SafeAreaView, Image, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing } from '../../constants/theme';
 import { BookCard } from '../../components/BookCard';
+import { AuthContext } from '../../src/context/AuthContext';
+import { getBooksAPI } from '../../src/api/bookApi';
 
-const CATEGORIES = ['Stocks Available', 'Nearly coming', 'Out of stock'];
-
-const FEATURED_BOOKS = [
-  {
-    id: '1',
-    title: 'Madol Duwa',
-    author: 'Martin Wickramasinghe',
-    rating: 4.8,
-    image: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1321484161i/13010468.jpg',
-  },
-  {
-    id: '2',
-    title: 'The Art of War',
-    author: 'Sun Tzu',
-    rating: 4.7,
-    image: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1630560184i/10534.jpg',
-  },
-];
+const CATEGORIES = ['All Stocks', 'Nearly coming', 'Out of stock'];
 
 export default function CustomerDashboard() {
   const router = useRouter();
-  const [activeCategory, setActiveCategory] = React.useState(0);
+  const { user } = useContext(AuthContext);
+  const [activeCategory, setActiveCategory] = useState(0);
+  const [books, setBooks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+        try {
+            const res = await getBooksAPI();
+            setBooks(res.data);
+        } catch (error) {
+            console.error("Failed to load books", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchBooks();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -34,11 +36,11 @@ export default function CustomerDashboard() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Hi, David 👋</Text>
+            <Text style={styles.greeting}>Hi, {user?.firstName || 'Reader'} 👋</Text>
             <Text style={styles.subGreeting}>Explore the habit of reading</Text>
           </View>
           <Image 
-            source={{ uri: 'https://i.pravatar.cc/150?u=david' }} 
+            source={{ uri: `https://ui-avatars.com/api/?name=${user?.firstName}+${user?.lastName}&background=random` }} 
             style={styles.avatar} 
           />
         </View>
@@ -87,14 +89,25 @@ export default function CustomerDashboard() {
         </ScrollView>
 
         {/* Books Grid */}
+        <View style={styles.categorySection}>
+          <Text style={styles.sectionTitle}>Available Books</Text>
+        </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.booksGrid}>
-          {FEATURED_BOOKS.map(book => (
-            <BookCard 
-              key={book.id}
-              {...book}
-              onPress={() => router.push({ pathname: '/book/[id]', params: { id: book.id } })}
-            />
-          ))}
+          {loading ? (
+             <ActivityIndicator size="large" color={Colors.light.primary} style={{ margin: 20 }} />
+          ) : (
+             books.map(book => (
+               <BookCard 
+                 key={book._id}
+                 id={book._id}
+                 title={book.title}
+                 author={book.author}
+                 rating={book.averageRating}
+                 image={book.imageUrl}
+                 onPress={() => router.push({ pathname: '/book/[id]', params: { id: book._id } })}
+               />
+             ))
+          )}
         </ScrollView>
       </ScrollView>
     </SafeAreaView>

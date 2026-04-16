@@ -9,11 +9,12 @@ interface ButtonProps {
   variant?: 'primary' | 'secondary' | 'dark' | 'outline';
   icon?: keyof typeof Ionicons.glyphMap;
   loading?: boolean;
+  disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
 }
 
-export const Button = ({ title, onPress, variant = 'primary', icon, loading, style, textStyle }: ButtonProps) => {
+export const Button = ({ title, onPress, variant = 'primary', icon, loading, disabled, style, textStyle }: ButtonProps) => {
   const getVariantStyles = () => {
     switch (variant) {
       case 'dark':
@@ -31,9 +32,9 @@ export const Button = ({ title, onPress, variant = 'primary', icon, loading, sty
 
   return (
     <TouchableOpacity 
-      style={[styles.baseContainer, vStyles.container, style]} 
+      style={[styles.baseContainer, vStyles.container, style, disabled && { opacity: 0.6 }]} 
       onPress={onPress}
-      disabled={loading}
+      disabled={loading || disabled}
       activeOpacity={0.8}
     >
       {loading ? (

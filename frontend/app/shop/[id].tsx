@@ -5,19 +5,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { Colors } from '../../constants/theme';
 import { AuthContext } from '../../src/context/AuthContext';
-import { getBookByIdAPI } from '../../src/api/bookApi';
+import { getShopByIdAPI } from '../../src/api/shopApi';
 import { getReviewsAPI, addReviewAPI } from '../../src/api/reviewApi';
 import { Button } from '../../components/Button';
 
 const { height } = Dimensions.get('window');
 
-export default function BookDetailsScreen() {
+export default function ShopDetailsScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
   const [activeTab, setActiveTab] = useState('Overview');
-  const [book, setBook] = useState<any>(null);
+  const [shop, setShop] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,13 +29,13 @@ export default function BookDetailsScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const bookRes = await getBookByIdAPI(id);
-        setBook(bookRes.data);
+        const shopRes = await getShopByIdAPI(id);
+        setShop(shopRes.data);
         const reviewsRes = await getReviewsAPI(id);
         setReviews(reviewsRes.data);
       } catch (error) {
-        console.error("Failed to load book or reviews", error);
-        Alert.alert("Error", "Could not load book details.");
+        console.error("Failed to load shop or reviews", error);
+        Alert.alert("Error", "Could not load shop details.");
       } finally {
         setLoading(false);
       }
@@ -54,9 +54,8 @@ export default function BookDetailsScreen() {
       }
       setSubmittingReview(true);
       try {
-          const payload = { targetId: id, targetModel: 'Book', rating, comment };
+          const payload = { targetId: id, targetModel: 'Shop', rating, comment };
           await addReviewAPI(payload, user.token);
-          // Refetch reviews
           const reviewsRes = await getReviewsAPI(id);
           setReviews(reviewsRes.data);
           setComment('');
@@ -76,36 +75,36 @@ export default function BookDetailsScreen() {
       );
   }
 
-  if (!book) return <View style={styles.container}><Text>Book not found</Text></View>;
+  if (!shop) return <View style={styles.container}><Text>Shop not found</Text></View>;
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       {/* Top Image & Overlay */}
-      <ImageBackground source={{ uri: book.imageUrl }} style={styles.topImage}>
+      <ImageBackground source={{ uri: shop.imageUrl }} style={styles.topImage}>
         <SafeAreaView>
           <View style={styles.topNav}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
               <Ionicons name="chevron-back" size={24} color="white" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.bookmarkButton}>
-              <Ionicons name="bookmark-outline" size={24} color="white" />
+              <Ionicons name="heart-outline" size={24} color="white" />
             </TouchableOpacity>
           </View>
         </SafeAreaView>
 
         <View style={styles.glassContainer}>
           <BlurView intensity={30} style={styles.glassBlur} tint="dark">
-             <View style={styles.bookInfoRow}>
+             <View style={styles.shopInfoRow}>
                 <View style={styles.mainInfo}>
-                   <Text style={styles.title}>{book.title}</Text>
+                   <Text style={styles.title}>{shop.name}</Text>
                    <View style={styles.authorRow}>
                       <Ionicons name="location-outline" size={16} color="rgba(255,255,255,0.7)" />
-                      <Text style={styles.authorText}>{book.author}</Text>
+                      <Text style={styles.authorText}>{shop.location}</Text>
                    </View>
                 </View>
-                <View style={styles.priceContainer}>
-                   <Text style={styles.priceLabel}>Price</Text>
-                   <Text style={styles.priceValue}>Rs.{book.price}</Text>
+                <View style={styles.ratingContainer}>
+                    <Ionicons name="star" size={24} color="#FFC107" />
+                    <Text style={styles.ratingValue}>{shop.averageRating?.toFixed(1) || 0}</Text>
                 </View>
              </View>
           </BlurView>
@@ -127,23 +126,13 @@ export default function BookDetailsScreen() {
             <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.metaRow}>
                 <View style={styles.statusBadge}>
-                    <Ionicons name="time-outline" size={18} color="#666" />
-                    <Text style={styles.statusText}>{book.stockCount > 0 ? `${book.stockCount} in stock` : 'Out of stock'}</Text>
-                </View>
-                <View style={styles.ratingBadge}>
-                    <Ionicons name="star" size={18} color="#FFC107" />
-                    <Text style={styles.ratingText}>{book.averageRating?.toFixed(1) || 0}</Text>
+                    <Ionicons name="call-outline" size={18} color="#666" />
+                    <Text style={styles.statusText}>{shop.contactNumber}</Text>
                 </View>
             </View>
             <Text style={styles.description}>
-                {book.description}
+                {shop.description}
             </Text>
-            {book.shop && (
-                <View style={{ marginTop: 20 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 10 }}>Available at</Text>
-                    <Text style={{ fontSize: 16, color: '#333' }}>{book.shop.name} ({book.shop.location})</Text>
-                </View>
-            )}
             <View style={{ height: 100 }} />
             </ScrollView>
         )}
@@ -203,16 +192,6 @@ export default function BookDetailsScreen() {
             </ScrollView>
         )}
       </View>
-
-      {/* Floating Button */}
-      {activeTab === 'Overview' && (
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.bookNowButton}>
-          <Text style={styles.bookNowText}>Reserve Book</Text>
-          <Ionicons name="paper-plane-outline" size={20} color="white" style={styles.bookNowIcon} />
-        </TouchableOpacity>
-      </View>
-      )}
     </KeyboardAvoidingView>
   );
 }
@@ -258,7 +237,7 @@ const styles = StyleSheet.create({
   glassBlur: {
     padding: 24,
   },
-  bookInfoRow: {
+  shopInfoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -281,18 +260,14 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.7)',
     marginLeft: 6,
   },
-  priceContainer: {
-    alignItems: 'flex-end',
+  ratingContainer: {
+    alignItems: 'center',
   },
-  priceLabel: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
-    marginBottom: 4,
-  },
-  priceValue: {
+  ratingValue: {
     fontSize: 24,
     fontWeight: '900',
     color: '#FFFFFF',
+    marginTop: 4,
   },
   content: {
     flex: 1,
@@ -335,52 +310,10 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: '600',
   },
-  ratingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    gap: 8,
-  },
-  ratingText: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '600',
-  },
   description: {
     fontSize: 18,
     lineHeight: 28,
     color: '#999',
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 25,
-    right: 25,
-  },
-  bookNowButton: {
-    backgroundColor: '#1A1A1A',
-    height: 60,
-    borderRadius: 20,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 15,
-    elevation: 10,
-  },
-  bookNowText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  bookNowIcon: {
-    marginLeft: 10,
-    transform: [{ rotate: '45deg' }],
   },
   reviewForm: {
       backgroundColor: '#f9f9f9',
