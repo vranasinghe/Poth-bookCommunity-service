@@ -12,7 +12,7 @@ const RegisterScreen = () => {
         try {
             const response = await registerUserAPI(formData);
             if (response.data) {
-                Alert.alert("Account cretion successfull");
+                Alert.alert("Account creation successfull");
             }
         } catch (error) {
             Alert.alert("Something Went wrong!", error.response?.data?.message || "Registration failed");

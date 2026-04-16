@@ -1,0 +1,33 @@
+const Shop = require('../models/shopModel');
+
+// @desc    Get all shops
+// @route   GET /api/shops
+// @access  Public
+const getShops = async (req, res) => {
+    try {
+        const shops = await Shop.find().populate('shopOwner', 'firstName lastName email');
+        res.status(200).json(shops);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get single shop
+// @route   GET /api/shops/:id
+// @access  Public
+const getShopById = async (req, res) => {
+    try {
+        const shop = await Shop.findById(req.params.id).populate('shopOwner', 'firstName lastName email');
+        if (!shop) {
+            return res.status(404).json({ message: 'Shop not found' });
+        }
+        res.status(200).json(shop);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = {
+    getShops,
+    getShopById
+};

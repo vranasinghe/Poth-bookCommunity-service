@@ -11,43 +11,62 @@ const tintColorDark = '#fff';
 export const Colors = {
   light: {
     text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
+    background: '#FFFFFF',
+    primary: '#003D71',
+    secondary: '#666666',
+    tint: '#007AFF',
     icon: '#687076',
     tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    tabIconSelected: '#003D71',
+    cardBackground: '#FFFFFF',
+    buttonBackground: '#1A1A1A',
+    buttonText: '#FFFFFF',
+    inputBackground: '#E8E8E8',
+    gradient: ['#004E92', '#000428'] as const,
+    success: '#4CAF50',
+    error: '#F44336',
+    warning: '#FFC107',
+    border: '#E0E0E0',
+    glass: 'rgba(255, 255, 255, 0.7)',
   },
   dark: {
     text: '#ECEDEE',
     background: '#151718',
-    tint: tintColorDark,
+    primary: '#007AFF',
+    secondary: '#9BA1A6',
+    tint: '#fff',
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    tabIconSelected: '#fff',
   },
+};
+
+export const Spacing = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 40,
 };
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+    sans: 'System',
+    serif: 'Georgia',
+    rounded: 'System',
+    mono: 'Courier',
   },
-  default: {
-    sans: 'normal',
+  android: {
+    sans: 'sans-serif',
     serif: 'serif',
-    rounded: 'normal',
+    rounded: 'sans-serif',
     mono: 'monospace',
   },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+  default: {
+    sans: 'System',
+    serif: 'Georgia',
+    rounded: 'System',
+    mono: 'Courier',
   },
 });
