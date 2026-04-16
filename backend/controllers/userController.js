@@ -1,4 +1,7 @@
 const User = require('../models/userModel');
+const Shop = require('../models/shopModel');
+const Book = require('../models/bookModel');
+const Review = require('../models/reviewModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -104,9 +107,35 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     const user = await User.findById(req.user._id);
+
     if (user) {
+        // Delete all reviews written by this user
+        await Review.deleteMany({ user: user._id });
+
+        // If user is a Shop Owner, delete their shops and associated books/reviews
+        if (user.userType === 'Shop Owner') {
+            const shops = await Shop.find({ shopOwner: user._id });
+
+            for (const shop of shops) {
+                // Find and delete all books in this shop
+                const books = await Book.find({ shop: shop._id });
+
+                for (const book of books) {
+                    // Delete reviews for this book
+                    await Review.deleteMany({ targetId: book._id, targetModel: 'Book' });
+                    // Delete the book
+                    await Book.deleteOne({ _id: book._id });
+                }
+
+                // Delete reviews for this shop itself
+                await Review.deleteMany({ targetId: shop._id, targetModel: 'Shop' });
+                // Delete the shop
+                await Shop.deleteOne({ _id: shop._id });
+            }
+        }
+
         await user.deleteOne();
-        res.json({ message: 'User removed' });
+        res.json({ message: 'User and all associated data removed' });
     } else {
         res.status(404).json({ message: 'User not found' });
     }

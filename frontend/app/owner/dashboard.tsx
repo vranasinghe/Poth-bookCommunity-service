@@ -1,7 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Image, Dimensions, Alert, Platform } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, Spacing } from '../../constants/theme';
+import { useRouter } from 'expo-router';
+import { useContext } from 'react';
+import { AuthContext } from '../../src/context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
@@ -23,6 +25,25 @@ const ACTIVITY = [
 ];
 
 export default function OwnerDashboard() {
+  const router = useRouter();
+  const { logoutContext } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    const performLogout = async () => {
+        await logoutContext();
+    };
+
+    if (Platform.OS === 'web') {
+        if (window.confirm("Logout: Are you sure you want to log out?")) {
+            performLogout();
+        }
+    } else {
+        Alert.alert("Logout", "Are you sure you want to log out?", [
+            { text: "Cancel", style: "cancel" },
+            { text: "Logout", style: "destructive", onPress: performLogout }
+        ]);
+    }
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -32,10 +53,17 @@ export default function OwnerDashboard() {
              <Ionicons name="book-outline" size={24} color={Colors.light.primary} />
              <Text style={styles.headerTitle}>The Curator's Desk</Text>
           </View>
-          <Image 
-            source={{ uri: 'https://i.pravatar.cc/150?u=owner' }} 
-            style={styles.avatar} 
-          />
+          <View style={styles.headerActions}>
+            <TouchableOpacity onPress={() => router.push('/account')}>
+                <Image 
+                    source={{ uri: 'https://i.pravatar.cc/150?u=owner' }} 
+                    style={styles.avatar} 
+                />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+                <Ionicons name="log-out-outline" size={28} color="#E74C3C" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Stats Carousel */}
@@ -151,6 +179,14 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+  },
+  logoutBtn: {
+    padding: 5,
   },
   statsScroll: {
     marginBottom: 25,
