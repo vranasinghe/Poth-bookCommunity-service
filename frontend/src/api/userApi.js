@@ -1,39 +1,20 @@
-import { Platform } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Ensure this matches your dev machine IP or localhost if running web.
-const API_URL = Platform.OS === 'web' 
-    ? 'http://localhost:5000/api/users' 
-    : 'http://192.168.56.1:5000/api/users';
+const API_URL = 'http://10.0.2.2:5001/api/users';
 
-// Explicit JSON headers — prevents browser preflight issues and ensures body is parsed
-const JSON_HEADERS = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
+export const registerUserAPI = async (userData: object) => {
+    return await axios.post(`${API_URL}/register`, userData);
 };
 
-export const registerUserAPI = async (userData) => {
-    return await axios.post(`${API_URL}/register`, userData, { headers: JSON_HEADERS });
+export const loginUserAPI = async (userData: { email: string; password: string }) => {
+    const response = await axios.post(`${API_URL}/login`, userData);
+    if (response.data.token) {
+        await AsyncStorage.setItem('userData', JSON.stringify(response.data));
+    }
+    return response;
 };
 
-export const loginUserAPI = async (credentials) => {
-    return await axios.post(`${API_URL}/login`, credentials, { headers: JSON_HEADERS });
+export const logoutUserAPI = async () => {
+    await AsyncStorage.removeItem('userData');
 };
-
-export const updateUserAPI = async (userData, token) => {
-    return await axios.put(`${API_URL}/profile`, userData, {
-        headers: {
-            ...JSON_HEADERS,
-            Authorization: `Bearer ${token}`
-        }
-    });
-};
-
-export const deleteUserAPI = async (token) => {
-    return await axios.delete(`${API_URL}/profile`, {
-        headers: {
-            ...JSON_HEADERS,
-            Authorization: `Bearer ${token}`
-        }
-    });
-};

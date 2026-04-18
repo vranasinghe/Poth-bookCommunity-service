@@ -1,57 +1,42 @@
-# Dependencies
+# Dependency directories
 node_modules/
 frontend/node_modules/
 backend/node_modules/
 
-# Build and Output
-dist/
-build/
-web-build/
-/ios/
-/android/
-*.apk
-*.ipa
-*.app
-*.app.dSYM.zip
-*.app.dSYM
-*.tsbuildinfo
-app-example/
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Expo & Metro
+# Expo targets
 .expo/
-.kotlin/
-.metro-health-check*
+dist/
+web-build/
+
+# Android specifics (React Native)
+android/app/build/
+*.iml
+*.apk
+*.aar
 *.jks
-*.p8
-*.p12
-*.key
-*.pem
-*.mobileprovision
-expo-env.d.ts
+*.keystore
+
+# iOS specifics (React Native)
+ios/build/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
 
 # Logs
-logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
 
-# Testing
-coverage/
-__snapshots__/
-
-# Environment Variables
-.env
-.env.*
-!.env.example
-
-# IDEs and Editors
+# Editor directories and files
 .vscode/
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 .idea/
 *.suo
 *.ntvs*
@@ -59,7 +44,7 @@ __snapshots__/
 *.sln
 *.sw?
 
-# OS Files
+# OS generated files
 .DS_Store
 .DS_Store?
 ehthumbs.db

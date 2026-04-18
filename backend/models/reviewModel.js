@@ -1,20 +1,15 @@
 const mongoose = require('mongoose');
 
 const reviewSchema = new mongoose.Schema({
-    user: {
+    customer: {
         type: mongoose.Schema.ObjectId,
         required: true,
         ref: 'User'
     },
-    targetId: {
+    shop: {
         type: mongoose.Schema.ObjectId,
         required: true,
-        refPath: 'targetModel'
-    },
-    targetModel: {
-        type: String,
-        required: true,
-        enum: ['Shop', 'Book']
+        ref: 'Shop'
     },
     rating: {
         type: Number,

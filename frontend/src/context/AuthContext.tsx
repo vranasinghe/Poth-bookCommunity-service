@@ -1,47 +1,45 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter, useSegments } from 'expo-router';
 
 type User = {
     _id: string;
     firstName: string;
-    lastName: string;
+    lastName?: string;
     email: string;
-    userType: string;
+    userType: 'Customer' | 'Shop Owner';
     token: string;
 };
 
 type AuthContextType = {
     user: User | null;
     isLoading: boolean;
-    loginContext: (userData: User) => Promise<void>;
-    logoutContext: () => Promise<void>;
-    updateUserContext: (data: Partial<User>) => Promise<void>;
+    isShopOwner: boolean;
+    login: (userData: User) => Promise<void>;
+    logout: () => Promise<void>;
 };
 
-export const AuthContext = createContext<AuthContextType>({
+const AuthContext = createContext<AuthContextType>({
     user: null,
     isLoading: true,
-    loginContext: async () => {},
-    logoutContext: async () => {},
-    updateUserContext: async () => {},
+    isShopOwner: false,
+    login: async () => {},
+    logout: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const rootSegment = useSegments()[0];
-    const router = useRouter();
 
+    // Restore session on app launch
     useEffect(() => {
         const loadUser = async () => {
             try {
-                const storedUser = await AsyncStorage.getItem('@poth_user');
-                if (storedUser) {
-                    setUser(JSON.parse(storedUser));
+                const stored = await AsyncStorage.getItem('userData');
+                if (stored) {
+                    setUser(JSON.parse(stored));
                 }
-            } catch (error) {
-                console.error("Failed to load user data", error);
+            } catch (e) {
+                console.error('Failed to load user from storage', e);
             } finally {
                 setIsLoading(false);
             }
@@ -49,49 +47,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loadUser();
     }, []);
 
-    useEffect(() => {
-        if (isLoading) return;
-
-        // Only guard: if unauthenticated and not already on an auth screen, push to login
-        if (!user && rootSegment !== 'auth' && rootSegment !== 'register' && rootSegment !== undefined) {
-            router.replace('/auth');
-        }
-    }, [user, isLoading, rootSegment]);
-
-    const loginContext = async (userData: User) => {
-        try {
-            await AsyncStorage.setItem('@poth_user', JSON.stringify(userData));
-            setUser(userData);
-        } catch (error) {
-            console.error("Failed to login", error);
-        }
+    const login = async (userData: User) => {
+        await AsyncStorage.setItem('userData', JSON.stringify(userData));
+        setUser(userData);
     };
 
-    const logoutContext = async () => {
-        try {
-            await AsyncStorage.removeItem('@poth_user');
-            setUser(null);
-            router.replace('/auth');
-        } catch (error) {
-            console.error("Failed to logout", error);
-        }
-    };
-
-    const updateUserContext = async (data: Partial<User>) => {
-        if (user) {
-            const updatedUser = { ...user, ...data };
-            try {
-                await AsyncStorage.setItem('@poth_user', JSON.stringify(updatedUser));
-                setUser(updatedUser);
-            } catch (error) {
-                console.error("Failed to update user context", error);
-            }
-        }
+    const logout = async () => {
+        await AsyncStorage.removeItem('userData');
+        setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, isLoading, loginContext, logoutContext, updateUserContext }}>
+        <AuthContext.Provider
+            value={{
+                user,
+                isLoading,
+                isShopOwner: user?.userType === 'Shop Owner',
+                login,
+                logout,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
 };
+
+export const useAuth = () => useContext(AuthContext);
