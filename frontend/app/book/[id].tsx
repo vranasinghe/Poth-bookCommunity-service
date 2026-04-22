@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ScrollView, SafeAreaView, Dimensions, ActivityIndicator, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ScrollView, SafeAreaView, Dimensions, ActivityIndicator, TextInput, Alert, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -25,6 +26,24 @@ export default function BookDetailsScreen() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Please allow photo library access to attach images.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets.length > 0) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,12 +73,22 @@ export default function BookDetailsScreen() {
       }
       setSubmittingReview(true);
       try {
-          const payload = { targetId: id, targetModel: 'Book', rating, comment };
-          await addReviewAPI(payload, user.token);
-          // Refetch reviews
+          const formData = new FormData();
+          formData.append('targetId', id as string);
+          formData.append('targetModel', 'Book');
+          formData.append('rating', String(rating));
+          formData.append('comment', comment);
+          if (selectedImage) {
+              const filename = selectedImage.split('/').pop() || 'photo.jpg';
+              const match = /\.([a-zA-Z]+)$/.exec(filename);
+              const type = match ? `image/${match[1].toLowerCase()}` : 'image/jpeg';
+              formData.append('image', { uri: selectedImage, name: filename, type } as any);
+          }
+          await addReviewAPI(formData, user.token);
           const reviewsRes = await getReviewsAPI(id);
           setReviews(reviewsRes.data);
           setComment('');
+          setSelectedImage(null);
           Alert.alert("Success", "Review submitted!");
       } catch (error: any) {
           Alert.alert("Error", error.response?.data?.message || "Failed to submit review");
@@ -168,6 +197,21 @@ export default function BookDetailsScreen() {
                         value={comment}
                         onChangeText={setComment}
                     />
+                    {/* Image Picker */}
+                    <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+                        <Ionicons name="camera-outline" size={20} color="#007bff" />
+                        <Text style={styles.imagePickerText}>
+                            {selectedImage ? 'Change Photo' : 'Add Photo'}
+                        </Text>
+                    </TouchableOpacity>
+                    {selectedImage && (
+                        <View style={styles.imagePreviewContainer}>
+                            <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
+                            <TouchableOpacity style={styles.removeImageBtn} onPress={() => setSelectedImage(null)}>
+                                <Ionicons name="close-circle" size={24} color="#ff4444" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
                     <Button title={submittingReview ? "Submitting..." : "Submit Review"} onPress={handleSubmitReview} disabled={submittingReview} />
                 </View>
 
@@ -196,6 +240,13 @@ export default function BookDetailsScreen() {
                                     </Text>
                                 </View>
                                 <Text style={{ marginTop: 10, color: '#333', lineHeight: 22 }}>{review.comment}</Text>
+                                {review.imageUrl && (
+                                    <Image
+                                        source={{ uri: review.imageUrl }}
+                                        style={styles.reviewImage}
+                                        resizeMode="cover"
+                                    />
+                                )}
                             </View>
                         ))
                     )}
@@ -433,5 +484,47 @@ const styles = StyleSheet.create({
       backgroundColor: Colors.light.primary,
       justifyContent: 'center',
       alignItems: 'center'
-  }
+  },
+  imagePicker: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: '#EBF4FF',
+      borderWidth: 1.5,
+      borderColor: '#007bff',
+      borderStyle: 'dashed',
+      borderRadius: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      marginBottom: 12,
+  },
+  imagePickerText: {
+      color: '#007bff',
+      fontWeight: '600',
+      fontSize: 15,
+  },
+  imagePreviewContainer: {
+      position: 'relative',
+      marginBottom: 12,
+      borderRadius: 12,
+      overflow: 'hidden',
+  },
+  imagePreview: {
+      width: '100%',
+      height: 180,
+      borderRadius: 12,
+  },
+  removeImageBtn: {
+      position: 'absolute',
+      top: 8,
+      right: 8,
+      backgroundColor: 'white',
+      borderRadius: 12,
+  },
+  reviewImage: {
+      width: '100%',
+      height: 180,
+      borderRadius: 10,
+      marginTop: 12,
+  },
 });

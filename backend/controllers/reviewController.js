@@ -25,12 +25,15 @@ const addReview = async (req, res) => {
     }
 
     try {
+        const imageUrl = req.file ? req.file.path : null;
+
         const review = await Review.create({
             user: req.user._id,
             targetId,
             targetModel,
             rating,
-            comment
+            comment,
+            imageUrl
         });
 
         // Update target average rating

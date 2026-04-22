@@ -21,7 +21,8 @@ export const getMyReviewsAPI = async (token) => {
 export const addReviewAPI = async (reviewData, token) => {
     const config = {
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
         }
     };
     return await axios.post(API_URL, reviewData, config);
