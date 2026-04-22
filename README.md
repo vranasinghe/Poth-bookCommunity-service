@@ -34,12 +34,12 @@ This project is a collaborative effort by 6 members, each handling a core module
 
 ## Core Features
 
-- 🔐 **User Authentication** — Register, login, and manage accounts with JWT-secured sessions
-- 🏪 **Shop Management** — Create and manage bookshop profiles with images and location info
-- 📚 **Book Management** — Add and browse books with cover images, pricing, and stock info
-- ⭐ **Review Management** — Leave star ratings and written comments on shops and books, with optional **photo uploads** saved to Cloudinary
-- 🔍 **Discovery & Search** — Browse all shops and books with real-time search filtering
-- 🖼️ **Image Uploads** — Shop profile images, book covers, and review photos are all hosted on Cloudinary
+- **User Authentication** — Register, login, and manage accounts with JWT-secured sessions
+- **Shop Management** — Create and manage bookshop profiles with images and location info
+- **Book Management** — Add and browse books with cover images, pricing, and stock info
+- **Review Management** — Leave star ratings and written comments on shops and books, with optional **photo uploads** saved to Cloudinary
+- **Discovery & Search** — Browse all shops and books with real-time search filtering
+- **Image Uploads** — Shop profile images, book covers, and review photos are all hosted on Cloudinary
 
 ---
 
