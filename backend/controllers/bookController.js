@@ -39,8 +39,36 @@ const getBooksByShop = async (req, res) => {
     }
 };
 
+// @desc    Add a new book
+// @route   POST /api/books
+// @access  Private
+const addBook = async (req, res) => {
+    try {
+        const { title, author, description, price, shop, category, stockCount } = req.body;
+        
+        // Image URL from Cloudinary (multer-storage-cloudinary provides req.file.path as the URL)
+        const imageUrl = req.file ? req.file.path : 'https://via.placeholder.com/150';
+
+        const book = await Book.create({
+            title,
+            author,
+            description,
+            price,
+            imageUrl,
+            shop,
+            category,
+            stockCount
+        });
+
+        res.status(201).json(book);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getBooks,
     getBookById,
-    getBooksByShop
+    getBooksByShop,
+    addBook
 };

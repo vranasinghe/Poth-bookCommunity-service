@@ -27,7 +27,33 @@ const getShopById = async (req, res) => {
     }
 };
 
+// @desc    Create a new shop
+// @route   POST /api/shops
+// @access  Private
+const createShop = async (req, res) => {
+    try {
+        const { name, description, location, contactNumber } = req.body;
+        
+        // Image URL from Cloudinary
+        const imageUrl = req.file ? req.file.path : 'https://via.placeholder.com/150';
+
+        const shop = await Shop.create({
+            shopOwner: req.user._id,
+            name,
+            description,
+            location,
+            contactNumber,
+            imageUrl
+        });
+
+        res.status(201).json(shop);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getShops,
-    getShopById
+    getShopById,
+    createShop
 };
