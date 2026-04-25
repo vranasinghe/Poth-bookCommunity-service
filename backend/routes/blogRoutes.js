@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect, isShopOwner } = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/uploadMiddleware');
 const {
     createBlog,
     getBlogs,
@@ -13,12 +14,12 @@ const {
 } = require('../controllers/blogController');
 
 router.route('/')
-    .post(protect, isShopOwner, createBlog)
+    .post(protect, isShopOwner, upload.single('coverImage'), createBlog)
     .get(getBlogs);
 
 router.route('/:id')
     .get(getBlogById)
-    .put(protect, isShopOwner, updateBlog)
+    .put(protect, isShopOwner, upload.single('coverImage'), updateBlog)
     .delete(protect, isShopOwner, deleteBlog);
 
 // ─── New: Likes & Comments (any logged-in user) ───────────────────────────────

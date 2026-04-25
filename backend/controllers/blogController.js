@@ -3,7 +3,9 @@ const Blog = require('../models/Blog');
 const createBlog = async (req, res) => {
     try {
         const { title, content, author } = req.body;
-        const newBlog = new Blog({ title, content, author });
+        // If a cover image was uploaded, save its filename
+        const coverImage = req.file ? req.file.filename : null;
+        const newBlog = new Blog({ title, content, author, coverImage });
         await newBlog.save();
         res.status(201).json(newBlog);
     } catch (error) {
@@ -32,9 +34,14 @@ const getBlogById = async (req, res) => {
 
 const updateBlog = async (req, res) => {
     try {
+        const updateData = { ...req.body };
+        // If a new cover image was uploaded, update it
+        if (req.file) {
+            updateData.coverImage = req.file.filename;
+        }
         const updatedBlog = await Blog.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            updateData,
             { new: true }
         );
         if (!updatedBlog) return res.status(404).json({ message: 'Blog not found' });

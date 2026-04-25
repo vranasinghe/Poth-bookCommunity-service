@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
     View, Text, StyleSheet, ActivityIndicator,
     ScrollView, TouchableOpacity, TextInput,
-    KeyboardAvoidingView, Platform, Alert
+    KeyboardAvoidingView, Platform, Alert, Image
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -137,6 +137,15 @@ export default function ViewBlog() {
             >
                 <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
+                    {/* Cover Image */}
+                    {blog.coverImage && (
+                        <Image
+                            source={{ uri: `http://10.0.2.2:5001/uploads/${blog.coverImage}` }}
+                            style={styles.coverImage}
+                            resizeMode="cover"
+                        />
+                    )}
+
                     {/* Title & Meta */}
                     <Text style={styles.title}>{blog.title}</Text>
                     <View style={styles.metaRow}>
@@ -242,6 +251,7 @@ export default function ViewBlog() {
 }
 
 const styles = StyleSheet.create({
+    coverImage: { width: '100%', height: 220, borderRadius: 0, marginBottom: 20 },
     container: { flex: 1, backgroundColor: '#FFFFFF' },
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF' },
     header: {

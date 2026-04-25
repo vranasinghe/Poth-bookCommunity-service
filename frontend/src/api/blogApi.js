@@ -25,12 +25,43 @@ export const getBlogById = async (id: string) => {
 };
 
 // ─── PROTECTED (Shop Owner JWT required) ─────────────────────────────
-export const createBlog = async (blogData: object) => {
-    return await axios.post(API_URL, blogData, await getAuthHeaders());
+// Uses fetch (not axios) because React Native's fetch handles FormData
+// multipart boundaries correctly — axios strips them and breaks file upload.
+export const createBlog = async (formData) => {
+    const stored = await AsyncStorage.getItem('userData');
+    const token = stored ? JSON.parse(stored)?.token : '';
+
+    const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            // ⚠️ Do NOT set Content-Type here — fetch sets it automatically
+            //    with the correct multipart boundary for FormData
+        },
+        body: formData,
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw { response: { data, status: response.status } };
+    return { data };
 };
 
-export const updateBlog = async (id: string, blogData: object) => {
-    return await axios.put(`${API_URL}/${id}`, blogData, await getAuthHeaders());
+export const updateBlog = async (id, formData) => {
+    const stored = await AsyncStorage.getItem('userData');
+    const token = stored ? JSON.parse(stored)?.token : '';
+
+    const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            // ⚠️ Do NOT set Content-Type here
+        },
+        body: formData,
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw { response: { data, status: response.status } };
+    return { data };
 };
 
 export const deleteBlog = async (id: string) => {

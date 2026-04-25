@@ -5,6 +5,7 @@ const blogSchema = new mongoose.Schema({
     content: { type: String, required: true },
     author: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
+    coverImage: { type: String, default: null }, // Safe: existing blogs default to null
     // ─── New fields (safe additions, existing blogs default to empty) ───
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     comments: [{
