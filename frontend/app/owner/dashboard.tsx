@@ -54,7 +54,7 @@ export default function OwnerDashboard() {
              <Text style={styles.headerTitle}>The Curator's Desk</Text>
           </View>
           <View style={styles.headerActions}>
-            <TouchableOpacity onPress={() => router.push('/account')}>
+            <TouchableOpacity onPress={() => router.push('/account' as any)}>
                 <Image 
                     source={{ uri: 'https://i.pravatar.cc/150?u=owner' }} 
                     style={styles.avatar} 

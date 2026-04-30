@@ -20,7 +20,7 @@ export default function CustomerDashboard() {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      router.push({ pathname: '/search', params: { q: searchQuery } });
+      router.push({ pathname: '/search' as any, params: { q: searchQuery } });
     }
   };
 
@@ -76,7 +76,7 @@ export default function CustomerDashboard() {
         <View style={styles.discoveryRow}>
           <TouchableOpacity 
             style={[styles.discoveryCard, { backgroundColor: '#E3F2FD' }]}
-            onPress={() => router.push('/discover/books')}
+            onPress={() => router.push('/discover/books' as any)}
           >
             <View style={styles.iconCircle}>
               <Ionicons name="book" size={24} color="#1976D2" />
@@ -86,7 +86,7 @@ export default function CustomerDashboard() {
 
           <TouchableOpacity 
             style={[styles.discoveryCard, { backgroundColor: '#F3E5F5' }]}
-            onPress={() => router.push('/discover/shops')}
+            onPress={() => router.push('/discover/shops' as any)}
           >
             <View style={styles.iconCircle}>
               <Ionicons name="storefront" size={24} color="#7B1FA2" />
@@ -139,7 +139,7 @@ export default function CustomerDashboard() {
                  author={book.author}
                  rating={book.averageRating}
                  image={book.imageUrl}
-                 onPress={() => router.push({ pathname: '/book/[id]', params: { id: book._id } })}
+                 onPress={() => router.push({ pathname: '/book/[id]' as any, params: { id: book._id } })}
                />
              ))
           )}
