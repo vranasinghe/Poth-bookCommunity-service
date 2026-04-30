@@ -10,17 +10,34 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { getBlogById, toggleLike, getComments, addComment } from '../../src/api/blogApi';
 import { useAuth } from '../../src/context/AuthContext';
 
+interface Blog {
+    _id: string;
+    title: string;
+    content: string;
+    author: string;
+    coverImage?: string;
+    likes?: string[];
+    createdAt?: string;
+}
+
+interface Comment {
+    _id: string;
+    userName: string;
+    text: string;
+    createdAt: string;
+}
+
 export default function ViewBlog() {
     const router = useRouter();
     const { id } = useLocalSearchParams();
     const { user } = useAuth();
 
-    const [blog, setBlog] = useState(null);
+    const [blog, setBlog] = useState<Blog | null>(null);
     const [loading, setLoading] = useState(true);
     const [likeCount, setLikeCount] = useState(0);
     const [liked, setLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
-    const [comments, setComments] = useState([]);
+    const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');
     const [commentLoading, setCommentLoading] = useState(false);
 
@@ -33,7 +50,8 @@ export default function ViewBlog() {
 
     const fetchBlog = async () => {
         try {
-            const response = await getBlogById(id);
+            const blogId = Array.isArray(id) ? id[0] : id;
+            const response = await getBlogById(blogId as string);
             const data = response.data;
             setBlog(data);
             setLikeCount(data.likes?.length || 0);
@@ -51,7 +69,8 @@ export default function ViewBlog() {
 
     const fetchComments = async () => {
         try {
-            const res = await getComments(id);
+            const blogId = Array.isArray(id) ? id[0] : id;
+            const res = await getComments(blogId as string);
             setComments(res.data);
         } catch (e) {
             console.error('Failed to fetch comments', e);
@@ -68,7 +87,8 @@ export default function ViewBlog() {
         }
         setLikeLoading(true);
         try {
-            const res = await toggleLike(id);
+            const blogId = Array.isArray(id) ? id[0] : id;
+            const res = await toggleLike(blogId as string);
             setLikeCount(res.data.likes);
             setLiked(res.data.liked);
         } catch (e) {
@@ -89,7 +109,8 @@ export default function ViewBlog() {
         if (!newComment.trim()) return;
         setCommentLoading(true);
         try {
-            const res = await addComment(id, newComment.trim());
+            const blogId = Array.isArray(id) ? id[0] : id;
+            const res = await addComment(blogId as string, newComment.trim());
             setComments(prev => [...prev, res.data]);
             setNewComment('');
         } catch (e) {

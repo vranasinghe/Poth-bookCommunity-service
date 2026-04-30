@@ -1,8 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from './apiConfig';
 
-// For Android Emulator, localhost of host machine = 10.0.2.2
-const API_URL = 'http://10.0.2.2:5001/api/blogs';
+const API_URL = `${API_BASE_URL}/api/blogs`;
 
 // Helper to build Authorization header from stored token
 const getAuthHeaders = async () => {

@@ -10,7 +10,14 @@ import { getBlogById, updateBlog } from '../../src/api/blogApi';
 
 const IMAGE_BASE = 'http://10.0.2.2:5001/uploads/';
 
+interface SelectedImage {
+    uri: string;
+    name: string;
+    type: string;
+}
+
 export default function EditBlog() {
+
     const router = useRouter();
     const { id } = useLocalSearchParams();
 
@@ -18,14 +25,15 @@ export default function EditBlog() {
     const [content, setContent] = useState('');
     const [author, setAuthor] = useState('');
     const [existingImage, setExistingImage] = useState(null); // filename from server
-    const [newImage, setNewImage] = useState(null);           // newly picked local image
+    const [newImage, setNewImage] = useState<SelectedImage | null>(null);           // newly picked local image
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
 
     useEffect(() => {
         const fetchBlog = async () => {
             try {
-                const response = await getBlogById(id);
+                const blogId = Array.isArray(id) ? id[0] : id;
+                const response = await getBlogById(blogId as string);
                 setTitle(response.data.title);
                 setContent(response.data.content);
                 setAuthor(response.data.author);
@@ -79,8 +87,8 @@ export default function EditBlog() {
         } catch (e) { Alert.alert('Gallery Error', String(e)); }
     };
 
-    const processImage = (asset) => {
-        const fileName = asset.uri.split('/').pop();
+    const processImage = (asset: ImagePicker.ImagePickerAsset) => {
+        const fileName = asset.uri.split('/').pop() || 'image.jpg';
         const fileType = asset.mimeType || 'image/jpeg';
         setNewImage({ uri: asset.uri, name: fileName, type: fileType });
         setExistingImage(null); // Hide old image preview
@@ -104,7 +112,8 @@ export default function EditBlog() {
                     type: newImage.type,
                 } as any);
             }
-            await updateBlog(id, formData);
+            const blogId = Array.isArray(id) ? id[0] : id;
+            await updateBlog(blogId as string, formData);
             Alert.alert('Success ✅', 'Blog updated successfully!');
             router.back();
         } catch (error: any) {

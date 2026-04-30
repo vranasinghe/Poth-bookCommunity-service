@@ -8,12 +8,19 @@ import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { createBlog } from '../../src/api/blogApi';
 
+interface SelectedImage {
+    uri: string;
+    name: string;
+    type: string;
+}
+
 export default function CreateBlog() {
+
     const router = useRouter();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [author, setAuthor] = useState('');
-    const [coverImage, setCoverImage] = useState(null);
+    const [coverImage, setCoverImage] = useState<SelectedImage | null>(null);
     const [loading, setLoading] = useState(false);
 
     const handleImageSelect = () => {
@@ -76,8 +83,8 @@ export default function CreateBlog() {
         }
     };
 
-    const processImage = (asset) => {
-        const fileName = asset.uri.split('/').pop();
+    const processImage = (asset: ImagePicker.ImagePickerAsset) => {
+        const fileName = asset.uri.split('/').pop() || 'image.jpg';
         const fileType = asset.mimeType || 'image/jpeg';
         setCoverImage({ uri: asset.uri, name: fileName, type: fileType });
     };

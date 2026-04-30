@@ -1,16 +1,7 @@
-import { Platform } from 'react-native';
 import axios from 'axios';
+import { API_BASE_URL, JSON_HEADERS } from './apiConfig';
 
-// Ensure this matches your dev machine IP or localhost if running web.
-const API_URL = Platform.OS === 'web' 
-    ? 'http://localhost:5000/api/users' 
-    : 'http://192.168.56.1:5000/api/users';
-
-// Explicit JSON headers — prevents browser preflight issues and ensures body is parsed
-const JSON_HEADERS = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-};
+const API_URL = `${API_BASE_URL}/api/users`;
 
 export const registerUserAPI = async (userData) => {
     return await axios.post(`${API_URL}/register`, userData, { headers: JSON_HEADERS });
