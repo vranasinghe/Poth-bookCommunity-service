@@ -75,7 +75,7 @@ export default function OwnerDashboard() {
               {stat.change && (
                 <View style={styles.changeBadge}>
                   <Ionicons name="trending-up" size={12} color={stat.color} />
-                  <Text style={styles.headerTitle}>The Curator&apos;s Desk</Text>
+                  <Text style={styles.headerTitle}>{`The Curator's Desk`}</Text>
                 </View>
               )}
               {stat.progress !== undefined && (
