@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getBlogs, deleteBlog } from '../../src/api/blogApi';
@@ -17,9 +17,9 @@ export default function BlogList() {
                 { text: 'OK', onPress: () => router.replace('/') }
             ]);
         }
-    }, [isShopOwner]);
+    }, [isShopOwner, router]);
 
-    const fetchBlogs = async () => {
+    const fetchBlogs = useCallback(async () => {
         setLoading(true);
         try {
             const response = await getBlogs();
@@ -29,13 +29,13 @@ export default function BlogList() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         if (isShopOwner) fetchBlogs();
-    }, []);
+    }, [isShopOwner, fetchBlogs]);
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (id: string) => {
         Alert.alert('Delete Blog', 'Are you sure you want to delete this blog?', [
             { text: 'Cancel', style: 'cancel' },
             {
@@ -45,6 +45,7 @@ export default function BlogList() {
                         await deleteBlog(id);
                         fetchBlogs();
                     } catch (error) {
+                        console.error('Delete error:', error);
                         Alert.alert('Error', 'Failed to delete blog.');
                     }
                 }
@@ -52,7 +53,7 @@ export default function BlogList() {
         ]);
     };
 
-    const renderItem = ({ item }) => (
+    const renderItem = ({ item }: { item: any }) => (
         <View style={styles.card}>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.author}>By: {item.author}</Text>

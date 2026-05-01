@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     View, Text, StyleSheet, ActivityIndicator,
     ScrollView, TouchableOpacity, TextInput,
@@ -41,14 +41,9 @@ export default function ViewBlog() {
     const [newComment, setNewComment] = useState('');
     const [commentLoading, setCommentLoading] = useState(false);
 
-    useEffect(() => {
-        if (id) {
-            fetchBlog();
-            fetchComments();
-        }
-    }, [id]);
 
-    const fetchBlog = async () => {
+
+    const fetchBlog = useCallback(async () => {
         try {
             const blogId = Array.isArray(id) ? id[0] : id;
             const response = await getBlogById(blogId as string);
@@ -60,14 +55,15 @@ export default function ViewBlog() {
                 setLiked(data.likes.includes(user._id));
             }
         } catch (error) {
+            console.error('Fetch blog error:', error);
             Alert.alert('Error', 'Could not fetch blog');
             router.back();
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, router, user]);
 
-    const fetchComments = async () => {
+    const fetchComments = useCallback(async () => {
         try {
             const blogId = Array.isArray(id) ? id[0] : id;
             const res = await getComments(blogId as string);
@@ -75,13 +71,20 @@ export default function ViewBlog() {
         } catch (e) {
             console.error('Failed to fetch comments', e);
         }
-    };
+    }, [id]);
+
+    useEffect(() => {
+        if (id) {
+            fetchBlog();
+            fetchComments();
+        }
+    }, [id, fetchBlog, fetchComments]);
 
     const handleLike = async () => {
         if (!user) {
             Alert.alert('Login Required', 'Please login to like this blog.', [
                 { text: 'Cancel', style: 'cancel' },
-                { text: 'Login', onPress: () => router.push('/login') }
+                { text: 'Login', onPress: () => router.push('/auth') as any }
             ]);
             return;
         }
@@ -92,6 +95,7 @@ export default function ViewBlog() {
             setLikeCount(res.data.likes);
             setLiked(res.data.liked);
         } catch (e) {
+            console.error('Like error:', e);
             Alert.alert('Error', 'Could not update like');
         } finally {
             setLikeLoading(false);
@@ -102,7 +106,7 @@ export default function ViewBlog() {
         if (!user) {
             Alert.alert('Login Required', 'Please login to comment.', [
                 { text: 'Cancel', style: 'cancel' },
-                { text: 'Login', onPress: () => router.push('/login') }
+                { text: 'Login', onPress: () => router.push('/auth') as any }
             ]);
             return;
         }
@@ -114,9 +118,10 @@ export default function ViewBlog() {
             setComments(prev => [...prev, res.data]);
             setNewComment('');
         } catch (e) {
+            console.error('Comment error:', e);
             Alert.alert('Error', 'Could not post comment');
         } finally {
-            setCommentLoading(false);
+            setLikeLoading(false);
         }
     };
 

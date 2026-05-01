@@ -39,6 +39,7 @@ export default function EditBlog() {
                 setAuthor(response.data.author);
                 setExistingImage(response.data.coverImage || null);
             } catch (error) {
+                console.error('Fetch blog error:', error);
                 Alert.alert('Error', 'Could not fetch blog details');
                 router.back();
             } finally {
@@ -46,7 +47,7 @@ export default function EditBlog() {
             }
         };
         if (id) fetchBlog();
-    }, [id]);
+    }, [id, router]);
 
     const handleImageSelect = () => {
         Alert.alert('Change Cover Image', 'Choose a source', [

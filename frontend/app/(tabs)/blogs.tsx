@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { 
-    View, Text, FlatList, TouchableOpacity, 
-    StyleSheet, ActivityIndicator, Alert, Image, 
+import React, { useState, useCallback } from 'react';
+import {
+    View, Text, FlatList, TouchableOpacity,
+    StyleSheet, ActivityIndicator, Alert, Image,
     SafeAreaView, StatusBar, RefreshControl, Dimensions
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -10,7 +10,7 @@ import { getBlogs, deleteBlog } from '../../src/api/blogApi';
 import { useAuth } from '../../src/context/AuthContext';
 import { Colors } from '../../constants/theme';
 
-const { width } = Dimensions.get('window');
+// const { width } = Dimensions.get('window');
 const IMAGE_BASE = 'http://10.0.2.2:5001/uploads/';
 
 interface Blog {
@@ -55,14 +55,15 @@ export default function BlogsScreen() {
     const handleDelete = (id: string) => {
         Alert.alert('Delete Blog', 'Are you sure you want to delete this blog?', [
             { text: 'Cancel', style: 'cancel' },
-            { 
-                text: 'Delete', 
-                style: 'destructive', 
+            {
+                text: 'Delete',
+                style: 'destructive',
                 onPress: async () => {
                     try {
                         await deleteBlog(id);
                         fetchBlogs();
                     } catch (error) {
+                        console.error('Delete error:', error);
                         Alert.alert('Error', 'Failed to delete blog.');
                     }
                 }
@@ -71,8 +72,8 @@ export default function BlogsScreen() {
     };
 
     const renderItem = ({ item }: { item: Blog }) => (
-        <TouchableOpacity 
-            style={styles.card} 
+        <TouchableOpacity
+            style={styles.card}
             activeOpacity={0.95}
             onPress={() => router.push(`/blog/view?id=${item._id}`)}
         >
@@ -83,7 +84,7 @@ export default function BlogsScreen() {
                     <Ionicons name="image-outline" size={48} color="#ccc" />
                 </View>
             )}
-            
+
             <View style={styles.cardContent}>
                 <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
                 <View style={styles.metaRow}>
@@ -95,18 +96,18 @@ export default function BlogsScreen() {
                     </Text>
                 </View>
                 <Text style={styles.cardSnippet} numberOfLines={2}>{item.content}</Text>
-                
+
                 {isShopOwner && (
                     <View style={styles.adminActions}>
-                        <TouchableOpacity 
-                            style={[styles.actionBtn, styles.editBtn]} 
+                        <TouchableOpacity
+                            style={[styles.actionBtn, styles.editBtn]}
                             onPress={() => router.push(`/blog/edit?id=${item._id}`)}
                         >
                             <MaterialIcons name="edit" size={18} color="#1976D2" />
                             <Text style={[styles.actionBtnText, styles.editText]}>Edit</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity 
-                            style={[styles.actionBtn, styles.deleteBtn]} 
+                        <TouchableOpacity
+                            style={[styles.actionBtn, styles.deleteBtn]}
                             onPress={() => handleDelete(item._id)}
                         >
                             <MaterialIcons name="delete-outline" size={18} color="#D32F2F" />
@@ -127,7 +128,7 @@ export default function BlogsScreen() {
                     <Text style={styles.headerSubtitle}>Discover community stories</Text>
                 </View>
                 {isShopOwner && (
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.createBtn}
                         onPress={() => router.push('/blog/create')}
                         activeOpacity={0.8}

@@ -132,6 +132,7 @@ export default function ManageStockScreen() {
         Alert.alert("Deleted", "Book removed from inventory");
         fetchBooks();
       } catch (error: any) {
+        console.error("Delete book error:", error);
         Alert.alert("Error", "Failed to delete book");
       }
     };

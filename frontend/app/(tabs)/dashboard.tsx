@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, SafeAreaView, Image, ActivityIndicator, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Colors, Spacing } from '../../constants/theme';
+import { Colors } from '../../constants/theme';
 import { BookCard } from '../../components/BookCard';
 import { AuthContext } from '../../src/context/AuthContext';
 import { getBooksAPI } from '../../src/api/bookApi';

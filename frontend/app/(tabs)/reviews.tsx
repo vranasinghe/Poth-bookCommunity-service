@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
   View,
   Text,
@@ -30,7 +30,7 @@ export default function ReviewsScreen() {
   const [editComment, setEditComment] = useState('');
   const [editRating, setEditRating] = useState(0);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     if (!user?.token) return;
     try {
       const res = await getMyReviewsAPI(user.token);
@@ -41,11 +41,11 @@ export default function ReviewsScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [user?.token]);
 
   useEffect(() => {
     fetchReviews();
-  }, [user]);
+  }, [fetchReviews]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -69,6 +69,7 @@ export default function ReviewsScreen() {
       setEditModalVisible(false);
       fetchReviews();
     } catch (error) {
+      console.error("Update error:", error);
       Alert.alert("Error", "Failed to update review");
     }
   };
@@ -80,6 +81,7 @@ export default function ReviewsScreen() {
         await deleteReviewAPI(id, user.token);
         fetchReviews();
       } catch (error) {
+        console.error("Delete error:", error);
         Alert.alert("Error", "Failed to delete review");
       }
     };

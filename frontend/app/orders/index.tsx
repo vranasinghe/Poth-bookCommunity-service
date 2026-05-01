@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView, ActivityIndicator, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors } from '../../constants/theme';
@@ -12,26 +12,28 @@ export default function OrdersScreen() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        // user._id mapping from context type User
-        if (user?._id) {
-            fetchOrders();
-        }
-    }, [user]);
 
-    const fetchOrders = async () => {
+
+    const fetchOrders = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await getReaderOrdersAPI(user._id);
+            const res = await getReaderOrdersAPI(user?._id || '');
             setOrders(res.data);
         } catch (error) {
+            console.error("Fetch orders error:", error);
             Alert.alert("Error", "Could not fetch orders");
         } finally {
             setLoading(false);
         }
-    };
+    }, [user?._id]);
 
-    const handleDelete = (orderId) => {
+    useEffect(() => {
+        if (user?._id) {
+            fetchOrders();
+        }
+    }, [user?._id, fetchOrders]);
+
+    const handleDelete = (orderId: string) => {
         const performDelete = async () => {
             try {
                 await deleteOrderAPI(orderId);
@@ -39,6 +41,7 @@ export default function OrdersScreen() {
                 if (Platform.OS === 'web') { window.alert("Order cancelled"); }
                 else { Alert.alert("Success", "Order cancelled"); }
             } catch (err) {
+                console.error("Cancel order error:", err);
                 if (Platform.OS === 'web') { window.alert("Error: Could not delete order"); }
                 else { Alert.alert("Error", "Could not delete order"); }
             }
@@ -67,7 +70,7 @@ export default function OrdersScreen() {
         }
     };
 
-    const renderOrderItem = ({ item }) => (
+    const renderOrderItem = ({ item }: { item: any }) => (
         <View style={styles.card}>
             <View style={styles.cardHeader}>
                 <Text style={styles.orderId}>Order #{item._id.slice(-6).toUpperCase()}</Text>
