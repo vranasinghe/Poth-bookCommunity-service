@@ -4,7 +4,7 @@ const createBlog = async (req, res) => {
     try {
         const { title, content, author } = req.body;
         // If a cover image was uploaded, save its filename
-        const coverImage = req.file ? req.file.filename : null;
+        const coverImage = req.file ? req.file.path : null;
         const newBlog = new Blog({ title, content, author, coverImage });
         await newBlog.save();
         res.status(201).json(newBlog);
@@ -37,7 +37,7 @@ const updateBlog = async (req, res) => {
         const updateData = { ...req.body };
         // If a new cover image was uploaded, update it
         if (req.file) {
-            updateData.coverImage = req.file.filename;
+            updateData.coverImage = req.file.path;
         }
         const updatedBlog = await Blog.findByIdAndUpdate(
             req.params.id,

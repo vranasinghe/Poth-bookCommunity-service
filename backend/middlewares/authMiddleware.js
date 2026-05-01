@@ -21,4 +21,12 @@ const protect = async (req, res, next) => {
     }
 };
 
-module.exports = { protect };
+const isShopOwner = (req, res, next) => {
+    if (req.user && req.user.userType === 'Shop Owner') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Not authorized as a shop owner' });
+    }
+};
+
+module.exports = { protect, isShopOwner };
