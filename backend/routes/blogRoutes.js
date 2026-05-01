@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect, isShopOwner } = require('../middlewares/authMiddleware');
-const upload = require('../middlewares/uploadMiddleware');
+const { upload } = require('../utils/cloudinaryConfig');
 const {
     createBlog,
     getBlogs,

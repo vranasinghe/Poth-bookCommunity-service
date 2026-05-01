@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  SafeAreaView, 
-  FlatList, 
-  TouchableOpacity, 
-  Alert, 
-  ActivityIndicator, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
   Platform,
   RefreshControl,
   TextInput,
@@ -23,7 +23,7 @@ export default function ReviewsScreen() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   // Edit Modal State
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedReview, setSelectedReview] = useState<any>(null);
@@ -62,9 +62,9 @@ export default function ReviewsScreen() {
   const saveEdit = async () => {
     if (!user?.token || !selectedReview) return;
     try {
-      await updateReviewAPI(selectedReview._id, { 
-        comment: editComment, 
-        rating: editRating 
+      await updateReviewAPI(selectedReview._id, {
+        comment: editComment,
+        rating: editRating
       }, user.token);
       setEditModalVisible(false);
       fetchReviews();
@@ -104,15 +104,15 @@ export default function ReviewsScreen() {
     return (
       <View style={styles.starsRow}>
         {[1, 2, 3, 4, 5].map((star) => (
-          <TouchableOpacity 
-            key={star} 
+          <TouchableOpacity
+            key={star}
             onPress={() => onRate && onRate(star)}
             disabled={!onRate}
           >
-            <Ionicons 
-              name={star <= rating ? "star" : "star-outline"} 
-              size={onRate ? 32 : 16} 
-              color={star <= rating ? "#FFD700" : "#CCC"} 
+            <Ionicons
+              name={star <= rating ? "star" : "star-outline"}
+              size={onRate ? 32 : 16}
+              color={star <= rating ? "#FFD700" : "#CCC"}
               style={onRate ? { marginHorizontal: 5 } : { marginRight: 2 }}
             />
           </TouchableOpacity>
@@ -137,7 +137,7 @@ export default function ReviewsScreen() {
           </TouchableOpacity>
         </View>
       </View>
-      
+
       {renderStars(item.rating)}
       <Text style={styles.commentText}>{item.comment}</Text>
       <Text style={styles.dateText}>{new Date(item.createdAt).toLocaleDateString()}</Text>
@@ -165,17 +165,17 @@ export default function ReviewsScreen() {
         renderItem={renderReviewItem}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={onRefresh} 
-            colors={[Colors.light.primary]} 
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors.light.primary]}
             tintColor={Colors.light.primary}
           />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="chatbubbles-outline" size={64} color="#EEE" />
-            <Text style={styles.emptyText}>You haven't written any reviews yet.</Text>
+            <Text style={styles.emptyText}>You haven&apos;t written any reviews yet.</Text>
           </View>
         }
       />

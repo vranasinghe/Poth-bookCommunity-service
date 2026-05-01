@@ -20,7 +20,7 @@ export const getBlogs = async () => {
     return await axios.get(API_URL);
 };
 
-export const getBlogById = async (id: string) => {
+export const getBlogById = async (id) => {
     return await axios.get(`${API_URL}/${id}`);
 };
 
@@ -64,19 +64,19 @@ export const updateBlog = async (id, formData) => {
     return { data };
 };
 
-export const deleteBlog = async (id: string) => {
+export const deleteBlog = async (id) => {
     return await axios.delete(`${API_URL}/${id}`, await getAuthHeaders());
 };
 
 // ─── Likes & Comments ─────────────────────────────────────────────────────────
-export const toggleLike = async (id: string) => {
+export const toggleLike = async (id) => {
     return await axios.post(`${API_URL}/${id}/like`, {}, await getAuthHeaders());
 };
 
-export const getComments = async (id: string) => {
+export const getComments = async (id) => {
     return await axios.get(`${API_URL}/${id}/comments`);
 };
 
-export const addComment = async (id: string, text: string) => {
+export const addComment = async (id, text) => {
     return await axios.post(`${API_URL}/${id}/comments`, { text }, await getAuthHeaders());
 };

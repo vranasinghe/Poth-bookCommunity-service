@@ -30,18 +30,18 @@ export default function OwnerDashboard() {
 
   const handleLogout = () => {
     const performLogout = async () => {
-        await logoutContext();
+      await logoutContext();
     };
 
     if (Platform.OS === 'web') {
-        if (window.confirm("Logout: Are you sure you want to log out?")) {
-            performLogout();
-        }
+      if (window.confirm("Logout: Are you sure you want to log out?")) {
+        performLogout();
+      }
     } else {
-        Alert.alert("Logout", "Are you sure you want to log out?", [
-            { text: "Cancel", style: "cancel" },
-            { text: "Logout", style: "destructive", onPress: performLogout }
-        ]);
+      Alert.alert("Logout", "Are you sure you want to log out?", [
+        { text: "Cancel", style: "cancel" },
+        { text: "Logout", style: "destructive", onPress: performLogout }
+      ]);
     }
   };
   return (
@@ -50,18 +50,18 @@ export default function OwnerDashboard() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerTitleRow}>
-             <Ionicons name="book-outline" size={24} color={Colors.light.primary} />
-             <Text style={styles.headerTitle}>{`The Curator's Desk`}</Text>
+            <Ionicons name="book-outline" size={24} color={Colors.light.primary} />
+            <Text style={styles.headerTitle}>{`The Curator's Desk`}</Text>
           </View>
           <View style={styles.headerActions}>
-            <TouchableOpacity onPress={() => router.push('/account')}>
-                <Image 
-                    source={{ uri: 'https://i.pravatar.cc/150?u=owner' }} 
-                    style={styles.avatar} 
-                />
+            <TouchableOpacity onPress={() => router.push('/account' as any)}>
+              <Image
+                source={{ uri: 'https://i.pravatar.cc/150?u=owner' }}
+                style={styles.avatar}
+              />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-                <Ionicons name="log-out-outline" size={28} color="#E74C3C" />
+              <Ionicons name="log-out-outline" size={28} color="#E74C3C" />
             </TouchableOpacity>
           </View>
         </View>
@@ -74,13 +74,13 @@ export default function OwnerDashboard() {
               <Text style={styles.statValue}>{stat.value}</Text>
               {stat.change && (
                 <View style={styles.changeBadge}>
-                   <Ionicons name="trending-up" size={12} color={stat.color} />
-                   <Text style={[styles.changeText, { color: stat.color }]}>{stat.change}</Text>
+                  <Ionicons name="trending-up" size={12} color={stat.color} />
+                  <Text style={styles.headerTitle}>{`The Curator's Desk`}</Text>
                 </View>
               )}
               {stat.progress !== undefined && (
                 <View style={styles.progressBarWrapper}>
-                   <View style={[styles.progressBar, { width: `${stat.progress * 100}%`, backgroundColor: '#8B4513' }]} />
+                  <View style={[styles.progressBar, { width: `${stat.progress * 100}%`, backgroundColor: '#8B4513' }]} />
                 </View>
               )}
             </View>
@@ -117,7 +117,7 @@ export default function OwnerDashboard() {
                   <Text style={styles.shopLoc}>{shop.location}</Text>
                 </View>
                 <View style={styles.statusBadge}>
-                   <Text style={styles.statusText}>STATUS: {shop.status}</Text>
+                  <Text style={styles.statusText}>STATUS: {shop.status}</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -130,7 +130,7 @@ export default function OwnerDashboard() {
           {ACTIVITY.map(act => (
             <View key={act.id} style={styles.activityItem}>
               <View style={styles.activityIcon}>
-                 <Ionicons name="book" size={24} color="#333" />
+                <Ionicons name="book" size={24} color="#333" />
               </View>
               <View style={styles.activityContent}>
                 <Text style={styles.activityShop}>{act.shop}</Text>
