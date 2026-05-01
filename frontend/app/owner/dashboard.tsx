@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Image, Dimensions, Alert, Platform } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, Spacing } from '../../constants/theme';
-import { useRouter } from 'expo-router';
-import { useContext } from 'react';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../src/context/AuthContext';
+import { getShopsByOwnerAPI } from '../../src/api/shopApi';
+import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -26,7 +28,41 @@ const ACTIVITY = [
 
 export default function OwnerDashboard() {
   const router = useRouter();
-  const { logoutContext } = useContext(AuthContext);
+  const { logoutContext, user } = useContext(AuthContext);
+  const [shops, setShops] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const params = useLocalSearchParams();
+
+  useEffect(() => {
+    fetchShops();
+    
+    if (params?.deletedMessage) {
+        Alert.alert("Success", params.deletedMessage as string);
+        // We can't easily clear localSearchParams in expo-router without re-navigating,
+        // but for a replace it's mostly fine.
+    }
+  }, [params?.deletedMessage]);
+
+  const fetchShops = async () => {
+    if (!user?.token) return;
+    try {
+      setLoading(true);
+      const response = await getShopsByOwnerAPI(user.token);
+      setShops(response.data);
+    } catch (error) {
+      console.error("Failed to fetch owner shops", error);
+      // Alert.alert("Error", "Failed to load your shops.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dashboardStats = [
+    { label: 'TOTAL SHOPS', value: shops.length.toString().padStart(2, '0'), change: 'Keep it up!', color: '#003D71' },
+    { label: 'ACTIVE ALERTS', value: '01', change: 'Requires your attention', color: '#E74C3C' },
+    { label: 'LOW STOCK ITEMS', value: '00', progress: 0.1, color: '#F1C40F' },
+  ];
 
   const handleLogout = () => {
     const performLogout = async () => {
@@ -55,10 +91,9 @@ export default function OwnerDashboard() {
           </View>
           <View style={styles.headerActions}>
             <TouchableOpacity onPress={() => router.push('/account' as any)}>
-              <Image
-                source={{ uri: 'https://i.pravatar.cc/150?u=owner' }}
-                style={styles.avatar}
-              />
+              <View style={styles.logoBox}>
+                <Text style={styles.logoTextSmall}>poth</Text>
+              </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
               <Ionicons name="log-out-outline" size={28} color="#E74C3C" />
@@ -68,14 +103,14 @@ export default function OwnerDashboard() {
 
         {/* Stats Carousel */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll} contentContainerStyle={styles.statsContent}>
-          {STATS.map((stat, idx) => (
+          {dashboardStats.map((stat, idx) => (
             <View key={idx} style={styles.statCard}>
               <Text style={styles.statLabel}>{stat.label}</Text>
               <Text style={styles.statValue}>{stat.value}</Text>
               {stat.change && (
                 <View style={styles.changeBadge}>
                   <Ionicons name="trending-up" size={12} color={stat.color} />
-                  <Text style={styles.headerTitle}>{`The Curator's Desk`}</Text>
+                  <Text style={styles.changeText}>{stat.change}</Text>
                 </View>
               )}
               {stat.progress !== undefined && (
@@ -91,7 +126,10 @@ export default function OwnerDashboard() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}><Ionicons name="flash" size={20} /> Quick Actions</Text>
           <View style={styles.actionsRow}>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => router.push('/owner/register-shop' as any)}
+            >
               <Ionicons name="business" size={20} color="white" />
               <Text style={styles.actionText}>Register New Shop</Text>
             </TouchableOpacity>
@@ -106,22 +144,36 @@ export default function OwnerDashboard() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Shops</Text>
-            <TouchableOpacity><Text style={styles.viewLink}>View Analytics</Text></TouchableOpacity>
-          </View>
-          {MY_SHOPS.map(shop => (
-            <TouchableOpacity key={shop.id} style={styles.shopCard}>
-              <Image source={{ uri: shop.image }} style={styles.shopImage} />
-              <View style={styles.shopInfo}>
-                <View>
-                  <Text style={styles.shopName}>{shop.name}</Text>
-                  <Text style={styles.shopLoc}>{shop.location}</Text>
-                </View>
-                <View style={styles.statusBadge}>
-                  <Text style={styles.statusText}>STATUS: {shop.status}</Text>
-                </View>
-              </View>
+            <TouchableOpacity onPress={fetchShops}>
+              <Ionicons name="refresh" size={20} color="#003D71" />
             </TouchableOpacity>
-          ))}
+          </View>
+          {loading ? (
+            <ActivityIndicator size="large" color={Colors.light.primary} />
+          ) : shops.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>You haven't registered any shops yet.</Text>
+            </View>
+          ) : (
+            shops.map(shop => (
+              <TouchableOpacity 
+                key={shop._id} 
+                style={styles.shopCard}
+                onPress={() => router.push(`/shop/${shop._id}` as any)}
+              >
+                <Image source={{ uri: shop.imageUrl }} style={styles.shopImage} />
+                <View style={styles.shopInfo}>
+                  <View>
+                    <Text style={styles.shopName}>{shop.name}</Text>
+                    <Text style={styles.shopLoc}>{shop.location}</Text>
+                  </View>
+                  <View style={styles.statusBadge}>
+                    <Text style={styles.statusText}>{shop.contactNumber}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
 
         {/* Recent Activity */}
@@ -175,10 +227,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#003D71',
   },
-  avatar: {
+  logoBox: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  logoTextSmall: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '400',
   },
   headerActions: {
     flexDirection: 'row',
@@ -385,5 +445,16 @@ const styles = StyleSheet.create({
   showAllText: {
     color: '#003D71',
     fontWeight: 'bold',
+  },
+  emptyState: {
+    padding: 40,
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+  },
+  emptyText: {
+    color: '#666',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
