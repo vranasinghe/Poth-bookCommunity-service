@@ -51,7 +51,7 @@ export default function OwnerDashboard() {
         <View style={styles.header}>
           <View style={styles.headerTitleRow}>
              <Ionicons name="book-outline" size={24} color={Colors.light.primary} />
-             <Text style={styles.headerTitle}>The Curator's Desk</Text>
+             <Text style={styles.headerTitle}>{`The Curator's Desk`}</Text>
           </View>
           <View style={styles.headerActions}>
             <TouchableOpacity onPress={() => router.push('/account')}>
