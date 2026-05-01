@@ -133,7 +133,10 @@ export default function OwnerDashboard() {
               <Ionicons name="business" size={20} color="white" />
               <Text style={styles.actionText}>Register New Shop</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionButton, styles.actionButtonSecondary]}>
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.actionButtonSecondary]}
+              onPress={() => router.push('/owner/update-stock' as any)}
+            >
               <Ionicons name="sync" size={20} color="#003D71" />
               <Text style={[styles.actionText, styles.actionTextSecondary]}>Update Stock</Text>
             </TouchableOpacity>
