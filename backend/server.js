@@ -8,17 +8,29 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const HOST = '0.0.0.0'; // Bind to all interfaces so LAN clients can connect
 
-// Explicit CORS config — allows all origins, methods, and necessary headers
-// This also handles the browser's preflight OPTIONS request correctly
+// Explicit CORS config — allows specific origins and necessary headers
 const corsOptions = {
-    origin: '*',
+    origin: (origin, callback) => {
+        const allowedOrigins = [
+            'http://localhost:8080',
+            'http://localhost:8081',
+            'http://localhost:5000',
+            'https://poth-bookcommunity-service-production.up.railway.app'
+        ];
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin === '*') {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    credentials: true,
     optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 };
 
 app.use(cors(corsOptions));
-// Note: cors() middleware automatically handles OPTIONS preflight when methods includes 'OPTIONS'
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -34,10 +46,7 @@ app.get('/', (req, res) => {
     res.status(200).json({ message: 'Poth API is running' });
 });
 
-mongoose.connect(process.env.MONGO_URI, {
-    serverSelectionTimeoutMS: 10000, // Fail fast — 10 seconds instead of 30
-    connectTimeoutMS: 10000,
-})
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('mongoDB Connected Successfully'))
     .catch((err) => {
         if (err.name === 'MongoNetworkTimeoutError') {
