@@ -48,7 +48,7 @@ export default function AuthScreen() {
             await loginContext(res.data);
             // Navigate based on userType
             if (res.data.userType === 'Shop Owner') {
-                router.replace('/owner/dashboard');
+                router.replace('/owner' as any);
             } else {
                 router.replace('/(tabs)/dashboard');
             }
@@ -66,7 +66,7 @@ export default function AuthScreen() {
             await loginContext(res.data);
             // Navigate based on userType
             if (res.data.userType === 'Shop Owner') {
-                router.replace('/owner/dashboard');
+                router.replace('/owner' as any);
             } else {
                 router.replace('/(tabs)/dashboard');
             }

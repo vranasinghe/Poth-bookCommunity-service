@@ -1,24 +1,13 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Image, Dimensions, Alert, Platform } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Colors, Spacing } from '../../constants/theme';
+import { Colors, Spacing } from '../../../constants/theme';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../src/context/AuthContext';
-import { getShopsByOwnerAPI } from '../../src/api/shopApi';
+import { AuthContext } from '../../../src/context/AuthContext';
+import { getShopsByOwnerAPI } from '../../../src/api/shopApi';
 import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
-
-const STATS = [
-  { label: 'TOTAL SHOPS', value: '08', change: '2 new this month', color: '#003D71' },
-  { label: 'ACTIVE ALERTS', value: '03', change: 'Requires your attention', color: '#E74C3C' },
-  { label: 'LOW STOCK ITEMS', value: '14', progress: 0.7, color: '#F1C40F' },
-];
-
-const MY_SHOPS = [
-  { id: '1', name: 'The Reading Nook', location: 'High Street, London', status: 'OPEN', image: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1000&auto=format&fit=crop' },
-  { id: '2', name: 'Ink & Parchment', location: 'Old Town Square', status: 'EVENT', image: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1000&auto=format&fit=crop' },
-];
 
 const ACTIVITY = [
   { id: '1', shop: 'The Midnight Library', action: 'Added 24 copies to "Reading Nook"', time: '2 HOURS AGO' },
@@ -39,8 +28,6 @@ export default function OwnerDashboard() {
     
     if (params?.deletedMessage) {
         Alert.alert("Success", params.deletedMessage as string);
-        // We can't easily clear localSearchParams in expo-router without re-navigating,
-        // but for a replace it's mostly fine.
     }
   }, [params?.deletedMessage]);
 
@@ -52,7 +39,6 @@ export default function OwnerDashboard() {
       setShops(response.data);
     } catch (error) {
       console.error("Failed to fetch owner shops", error);
-      // Alert.alert("Error", "Failed to load your shops.");
     } finally {
       setLoading(false);
     }
@@ -80,6 +66,7 @@ export default function OwnerDashboard() {
       ]);
     }
   };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -90,7 +77,7 @@ export default function OwnerDashboard() {
             <Text style={styles.headerTitle}>{`The Curator's Desk`}</Text>
           </View>
           <View style={styles.headerActions}>
-            <TouchableOpacity onPress={() => router.push('/account' as any)}>
+            <TouchableOpacity onPress={() => router.push('/owner/account' as any)}>
               <View style={styles.logoBox}>
                 <Text style={styles.logoTextSmall}>poth</Text>
               </View>

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView, ActivityIndicator, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Colors } from '../../constants/theme';
+import { Colors } from '../../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { getShopOrdersAPI, updateOrderStatusAPI, deleteOrderAPI } from '../../src/api/orderApi';
-import { AuthContext } from '../../src/context/AuthContext';
-import { getShopsAPI } from '../../src/api/shopApi';
+import { getShopOrdersAPI, updateOrderStatusAPI, deleteOrderAPI } from '../../../src/api/orderApi';
+import { AuthContext } from '../../../src/context/AuthContext';
+import { getShopsAPI } from '../../../src/api/shopApi';
 
 export default function ShopOwnerOrdersScreen() {
     const { user } = useContext(AuthContext);
@@ -42,7 +42,7 @@ export default function ShopOwnerOrdersScreen() {
         }
     };
 
-    const handleUpdateStatus = (orderId, newStatus) => {
+    const handleUpdateStatus = (orderId: string, newStatus: string) => {
         const performUpdate = async () => {
             try {
                 await updateOrderStatusAPI(orderId, newStatus);
@@ -73,7 +73,7 @@ export default function ShopOwnerOrdersScreen() {
         }
     };
 
-    const handleRemoveOrder = (orderId) => {
+    const handleRemoveOrder = (orderId: string) => {
         const performDelete = async () => {
             try {
                 await deleteOrderAPI(orderId);
@@ -98,7 +98,7 @@ export default function ShopOwnerOrdersScreen() {
         }
     };
 
-    const renderOrderItem = ({ item }) => (
+    const renderOrderItem = ({ item }: { item: any }) => (
         <View style={styles.card}>
             <View style={styles.cardHeader}>
                 <Text style={styles.orderId}>Order #{item._id.slice(-6).toUpperCase()}</Text>
