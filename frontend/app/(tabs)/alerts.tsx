@@ -77,7 +77,7 @@ export default function AlertsScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Shop Alerts</Text>
-        <Text style={styles.headerSubtitle}>Stock updates from shops you follow</Text>
+        <Text style={styles.headerSubtitle}>Stock updates and reports from all shops</Text>
       </View>
 
       {loading ? (
@@ -88,7 +88,7 @@ export default function AlertsScreen() {
         <View style={styles.centerBox}>
           <Ionicons name="notifications-off-outline" size={64} color="#DDD" />
           <Text style={styles.emptyTitle}>No Alerts Yet</Text>
-          <Text style={styles.emptySub}>Follow shops to receive stock notifications.</Text>
+          <Text style={styles.emptySub}>There are no shop alerts available right now.</Text>
         </View>
       ) : (
         <FlatList
