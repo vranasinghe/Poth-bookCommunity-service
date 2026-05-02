@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView, ActivityIndicator, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors } from '../../../constants/theme';
@@ -13,13 +13,7 @@ export default function ShopOwnerOrdersScreen() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (user?._id) {
-            fetchOrders();
-        }
-    }, [user]);
-
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
         try {
             setLoading(true);
             const shopsRes = await getShopsAPI();
@@ -36,11 +30,18 @@ export default function ShopOwnerOrdersScreen() {
             
             setOrders(allOrders as any);
         } catch (error) {
+            console.error(error);
             Alert.alert("Error", "Could not fetch shop orders");
         } finally {
             setLoading(false);
         }
-    };
+    }, [user?._id]);
+
+    useEffect(() => {
+        if (user?._id) {
+            fetchOrders();
+        }
+    }, [user, fetchOrders]);
 
     const handleUpdateStatus = (orderId: string, newStatus: string) => {
         const performUpdate = async () => {
@@ -53,6 +54,7 @@ export default function ShopOwnerOrdersScreen() {
                     Alert.alert("Success", `Order moved to ${newStatus}`);
                 }
             } catch (err) {
+                console.error(err);
                 if (Platform.OS === 'web') {
                     window.alert("Error: Could not update order");
                 } else {
@@ -81,6 +83,7 @@ export default function ShopOwnerOrdersScreen() {
                 if (Platform.OS === 'web') { window.alert("Order removed & stock refunded"); }
                 else { Alert.alert("Success", "Order removed & stock refunded"); }
             } catch (err) {
+                console.error(err);
                 if (Platform.OS === 'web') { window.alert("Failed to remove order"); }
                 else { Alert.alert("Error", "Failed to remove order"); }
             }

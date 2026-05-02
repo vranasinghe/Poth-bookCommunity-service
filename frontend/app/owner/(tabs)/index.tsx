@@ -1,11 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Image, Dimensions, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Image, Dimensions, Alert, Platform, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../../constants/theme';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { AuthContext } from '../../../src/context/AuthContext';
 import { getShopsByOwnerAPI } from '../../../src/api/shopApi';
-import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -23,15 +22,7 @@ export default function OwnerDashboard() {
 
   const params = useLocalSearchParams();
 
-  useEffect(() => {
-    fetchShops();
-
-    if (params?.deletedMessage) {
-      Alert.alert("Success", params.deletedMessage as string);
-    }
-  }, [params?.deletedMessage]);
-
-  const fetchShops = async () => {
+  const fetchShops = useCallback(async () => {
     if (!user?.token) return;
     try {
       setLoading(true);
@@ -42,7 +33,15 @@ export default function OwnerDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchShops();
+
+    if (params?.deletedMessage) {
+      Alert.alert("Success", params.deletedMessage as string);
+    }
+  }, [params?.deletedMessage, fetchShops]);
 
   const dashboardStats = [
     { label: 'TOTAL SHOPS', value: shops.length.toString().padStart(2, '0'), change: 'Keep it up!', color: '#003D71' },
@@ -142,7 +141,7 @@ export default function OwnerDashboard() {
             <ActivityIndicator size="large" color={Colors.light.primary} />
           ) : shops.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>You haven't registered any shops yet.</Text>
+              <Text style={styles.emptyText}>You haven&apos;t registered any shops yet.</Text>
             </View>
           ) : (
             shops.map(shop => (

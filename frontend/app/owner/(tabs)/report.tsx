@@ -4,7 +4,7 @@ import {
     StyleSheet, ActivityIndicator, Alert, Image
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { AuthContext } from '../../../src/context/AuthContext';
 import { getShopsByOwnerAPI } from '../../../src/api/shopApi';

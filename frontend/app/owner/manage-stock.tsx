@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -43,11 +43,7 @@ export default function ManageStockScreen() {
   const [editImage, setEditImage] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
 
-  useEffect(() => {
-    fetchBooks();
-  }, []);
-
-  const fetchBooks = async () => {
+  const fetchBooks = useCallback(async () => {
     if (!user?.token) return;
     try {
       setLoading(true);
@@ -59,7 +55,11 @@ export default function ManageStockScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [user?.token]);
+
+  useEffect(() => {
+    fetchBooks();
+  }, [fetchBooks]);
 
   const handleEdit = (book: any) => {
     setSelectedBook(book);

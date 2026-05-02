@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -41,11 +41,7 @@ export default function RegisterBookScreen() {
     shop: '',
   });
 
-  useEffect(() => {
-    fetchShops();
-  }, []);
-
-  const fetchShops = async () => {
+  const fetchShops = useCallback(async () => {
     if (!user?.token) return;
     try {
       const response = await getShopsByOwnerAPI(user.token);
@@ -59,7 +55,11 @@ export default function RegisterBookScreen() {
     } finally {
       setShopsLoading(false);
     }
-  };
+  }, [user?.token]);
+
+  useEffect(() => {
+    fetchShops();
+  }, [fetchShops]);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
