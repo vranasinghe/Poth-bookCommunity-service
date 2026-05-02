@@ -3,6 +3,7 @@ import { API_BASE_URL, JSON_HEADERS } from './apiConfig';
 
 const API_URL = `${API_BASE_URL}/api/orders`;
 
+
 // Create a new order
 export const createOrderAPI = async (orderData) => {
     return await axios.post(`${API_URL}`, orderData, { headers: JSON_HEADERS });
