@@ -1,15 +1,7 @@
-import { Platform } from 'react-native';
 import axios from 'axios';
+import { API_BASE_URL, JSON_HEADERS } from './apiConfig';
 
-// Ensure this matches your dev machine IP or localhost if running web.
-const API_URL = Platform.OS === 'web'
-    ? 'http://localhost:5000/api/orders'
-    : 'http://192.168.1.7:5000/api/orders';
-
-const JSON_HEADERS = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-};
+const API_URL = `${API_BASE_URL}/api/orders`;
 
 // Create a new order
 export const createOrderAPI = async (orderData) => {
