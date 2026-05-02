@@ -115,6 +115,26 @@ export default function ShopOwnerOrdersScreen() {
             <Text style={styles.detailsText}>Address: {item.deliveryDetails?.address}, {item.deliveryDetails?.city}</Text>
             <Text style={styles.detailsText}>Quantity: {item.quantity} | Total: Rs. {item.totalPrice}</Text>
 
+            {item.paymentSlipUrl && (
+                <View style={styles.slipContainer}>
+                    <Text style={styles.slipLabel}>Payment Slip:</Text>
+                    <TouchableOpacity 
+                        onPress={() => {
+                            if (Platform.OS === 'web') {
+                                window.open(item.paymentSlipUrl, '_blank');
+                            } else {
+                                // For mobile, we could use a modal or Linking
+                                Alert.alert("Payment Slip", "View slip image?", [
+                                    { text: "Cancel", style: "cancel" },
+                                    { text: "View", onPress: () => router.push({ pathname: "/owner/view-slip", params: { url: item.paymentSlipUrl } }) }
+                                ]);
+                            }
+                        }}>
+                        <Text style={styles.viewSlipText}>View Attached Slip</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+
             {item.status !== 'Cancelled' && item.status !== 'Delivered' && (
                 <View style={styles.actions}>
                     {item.status === 'Pending' && (
@@ -180,6 +200,9 @@ const styles = StyleSheet.create({
     statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 15 },
     statusText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
     detailsText: { fontSize: 14, color: '#444', marginBottom: 5 },
+    slipContainer: { marginTop: 10, padding: 10, backgroundColor: '#f0f4f8', borderRadius: 8, flexDirection: 'row', alignItems: 'center' },
+    slipLabel: { fontSize: 14, fontWeight: 'bold', color: '#555', marginRight: 10 },
+    viewSlipText: { fontSize: 14, color: Colors.light.primary, fontWeight: '600', textDecorationLine: 'underline' },
     actions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 15 },
     btn: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8 },
     btnText: { color: 'white', fontWeight: 'bold' }

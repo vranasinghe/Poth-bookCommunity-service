@@ -8,8 +8,9 @@ const {
     updateOrderDelivery,
     deleteOrder 
 } = require('../controllers/orderController');
+const { upload } = require('../utils/cloudinaryConfig');
 
-router.route('/').post(addOrder);
+router.route('/').post(upload.single('paymentSlip'), addOrder);
 router.route('/:id').delete(deleteOrder);
 router.route('/:id/status').put(updateOrderStatus);
 router.route('/:id/delivery').put(updateOrderDelivery);

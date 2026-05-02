@@ -7,6 +7,12 @@ const Book = require('../models/bookModel');
 const addOrder = async (req, res) => {
     try {
         const { reader, shop, book, quantity, totalPrice, deliveryDetails } = req.body;
+        // Since we are using FormData, deliveryDetails might be a string
+        const parsedDeliveryDetails = typeof deliveryDetails === 'string' ? JSON.parse(deliveryDetails) : deliveryDetails;
+
+        if (!req.file) {
+            return res.status(400).json({ message: 'Please upload a payment slip' });
+        }
 
         // Check stock first
         const targetBook = await Book.findById(book);
@@ -23,7 +29,8 @@ const addOrder = async (req, res) => {
             book,
             quantity,
             totalPrice,
-            deliveryDetails
+            deliveryDetails: parsedDeliveryDetails,
+            paymentSlipUrl: req.file.path
         });
 
         // Deduct from stock

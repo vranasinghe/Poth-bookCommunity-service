@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../../src/context/AuthContext';
+import * as ImagePicker from 'expo-image-picker';
 import { createOrderAPI } from '../../src/api/orderApi';
 import { getBookByIdAPI } from '../../src/api/bookApi';
 
@@ -20,6 +21,7 @@ export default function CreateOrderScreen() {
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
     const [phone, setPhone] = useState('');
+    const [image, setImage] = useState<any>(null);
 
     React.useEffect(() => {
         const fetchBook = async () => {
@@ -35,25 +37,52 @@ export default function CreateOrderScreen() {
         fetchBook();
     }, [bookId]);
 
+    const pickImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setImage(result.assets[0]);
+        }
+    };
+
     const handleCreateOrder = async () => {
-        if (!address || !city || !phone) {
-            if (Platform.OS === 'web') { window.alert("Please fill all delivery details"); }
-            else { Alert.alert("Error", "Please fill all delivery details"); }
+        if (!address || !city || !phone || !image) {
+            if (Platform.OS === 'web') { window.alert("Please fill all details and upload payment slip"); }
+            else { Alert.alert("Error", "Please fill all details and upload payment slip"); }
             return;
         }
 
         const pricePerItem = bookDetails ? bookDetails.price : 2000;
-        const orderData = {
-            reader: user?._id,
-            shop: shopId,
-            book: bookId,
-            quantity: Number(quantity),
-            totalPrice: Number(quantity) * pricePerItem,
-            deliveryDetails: { address, city, phone }
-        };
+        
+        const formData = new FormData();
+        formData.append('reader', user?._id || '');
+        formData.append('shop', shopId);
+        formData.append('book', bookId);
+        formData.append('quantity', quantity);
+        formData.append('totalPrice', String(Number(quantity) * pricePerItem));
+        formData.append('deliveryDetails', JSON.stringify({ address, city, phone }));
+        
+        if (image) {
+            const uri = image.uri;
+            const name = uri.split('/').pop();
+            const match = /\.(\w+)$/.exec(name || '');
+            const type = match ? `image/${match[1]}` : `image`;
+            
+            // @ts-ignore
+            formData.append('paymentSlip', {
+                uri: Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
+                name: name,
+                type: type,
+            });
+        }
 
         try {
-            await createOrderAPI(orderData);
+            await createOrderAPI(formData);
             if (Platform.OS === 'web') {
                 window.alert("Test Order Created Successfully!");
                 router.replace('/orders');
@@ -123,6 +152,19 @@ export default function CreateOrderScreen() {
                     onChangeText={setPhone} 
                 />
 
+                <Text style={styles.headerTitle}>Payment Slip</Text>
+                <TouchableOpacity style={styles.imageBtn} onPress={pickImage}>
+                    <Ionicons name="camera" size={24} color="#666" />
+                    <Text style={styles.imageBtnText}>{image ? "Change Slip Photo" : "Upload Payment Slip"}</Text>
+                </TouchableOpacity>
+
+                {image && (
+                    <View style={styles.previewContainer}>
+                        <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                        <Text style={styles.previewText}>Slip attached successfully</Text>
+                    </View>
+                )}
+
                 <TouchableOpacity style={styles.submitBtn} onPress={handleCreateOrder}>
                     <Text style={styles.submitBtnText}>Place Order (Rs. {Number(quantity) * (bookDetails ? bookDetails.price : 2000)})</Text>
                 </TouchableOpacity>
@@ -146,6 +188,10 @@ const styles = StyleSheet.create({
     qtyText: { fontSize: 20, fontWeight: 'bold', marginHorizontal: 20 },
     headerTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15, color: '#333' },
     input: { backgroundColor: '#f5f5f5', padding: 15, borderRadius: 10, marginBottom: 15, fontSize: 16 },
+    imageBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', padding: 15, borderRadius: 10, marginBottom: 10, borderStyle: 'dashed', borderWidth: 1, borderColor: '#ccc' },
+    imageBtnText: { marginLeft: 10, color: '#666', fontSize: 16 },
+    previewContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, backgroundColor: '#e8f5e9', padding: 10, borderRadius: 8 },
+    previewText: { marginLeft: 10, color: '#2e7d32', fontWeight: '500' },
     submitBtn: { backgroundColor: Colors.light.primary, padding: 18, borderRadius: 10, alignItems: 'center', marginTop: 10 },
     submitBtnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' }
 });
