@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -43,7 +43,7 @@ export default function AlertsScreen() {
       </View>
 
       <Text style={styles.title}>{item.title}</Text>
-      
+
       {item.notes ? <Text style={styles.notes}>{item.notes}</Text> : null}
 
       {item.imageUrl ? (
@@ -62,9 +62,9 @@ export default function AlertsScreen() {
           <Text style={styles.moreText}>+ {item.breakdown.length - 3} more items...</Text>
         )}
       </View>
-      
-      <TouchableOpacity 
-        style={styles.viewShopBtn} 
+
+      <TouchableOpacity
+        style={styles.viewShopBtn}
         onPress={() => router.push(`/shop/${item.shopId}` as any)}
       >
         <Text style={styles.viewShopText}>View Shop</Text>

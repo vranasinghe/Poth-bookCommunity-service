@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Image, Dimensions, Alert, Platform } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Colors, Spacing } from '../../../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '../../../constants/theme';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../../src/context/AuthContext';
@@ -25,9 +25,9 @@ export default function OwnerDashboard() {
 
   useEffect(() => {
     fetchShops();
-    
+
     if (params?.deletedMessage) {
-        Alert.alert("Success", params.deletedMessage as string);
+      Alert.alert("Success", params.deletedMessage as string);
     }
   }, [params?.deletedMessage]);
 
@@ -113,14 +113,14 @@ export default function OwnerDashboard() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}><Ionicons name="flash" size={20} /> Quick Actions</Text>
           <View style={styles.actionsRow}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.actionButton}
               onPress={() => router.push('/owner/register-shop' as any)}
             >
               <Ionicons name="business" size={20} color="white" />
               <Text style={styles.actionText}>Register New Shop</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.actionButton, styles.actionButtonSecondary]}
               onPress={() => router.push('/owner/update-stock' as any)}
             >
@@ -146,8 +146,8 @@ export default function OwnerDashboard() {
             </View>
           ) : (
             shops.map(shop => (
-              <TouchableOpacity 
-                key={shop._id} 
+              <TouchableOpacity
+                key={shop._id}
                 style={styles.shopCard}
                 onPress={() => router.push(`/shop/${shop._id}` as any)}
               >

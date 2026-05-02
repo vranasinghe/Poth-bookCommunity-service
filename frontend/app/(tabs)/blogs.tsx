@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import {
     View, Text, FlatList, TouchableOpacity,
     StyleSheet, ActivityIndicator, Alert, Image,
-    SafeAreaView, StatusBar, RefreshControl, Dimensions
+    SafeAreaView, StatusBar, RefreshControl
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
