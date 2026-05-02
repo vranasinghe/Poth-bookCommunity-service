@@ -41,6 +41,7 @@ app.use('/api/books', require('./routes/bookRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/blogs', require('./routes/blogRoutes'));
+app.use('/api/reports', require('./routes/reportRoutes'));
 
 app.get('/', (req, res) => {
     res.status(200).json({ message: 'Poth API is running' });

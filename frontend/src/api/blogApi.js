@@ -6,7 +6,7 @@ const API_URL = `${API_BASE_URL}/api/blogs`;
 
 // Helper to build Authorization header from stored token
 const getAuthHeaders = async () => {
-    const stored = await AsyncStorage.getItem('userData');
+    const stored = await AsyncStorage.getItem('@poth_user');
     const user = stored ? JSON.parse(stored) : null;
     return {
         headers: {
@@ -24,11 +24,11 @@ export const getBlogById = async (id) => {
     return await axios.get(`${API_URL}/${id}`);
 };
 
-// ─── PROTECTED (Shop Owner JWT required) ─────────────────────────────
+// ─── PROTECTED (JWT required) ─────────────────────────────
 // Uses fetch (not axios) because React Native's fetch handles FormData
 // multipart boundaries correctly — axios strips them and breaks file upload.
 export const createBlog = async (formData) => {
-    const stored = await AsyncStorage.getItem('userData');
+    const stored = await AsyncStorage.getItem('@poth_user');
     const token = stored ? JSON.parse(stored)?.token : '';
 
     const response = await fetch(API_URL, {
@@ -47,7 +47,7 @@ export const createBlog = async (formData) => {
 };
 
 export const updateBlog = async (id, formData) => {
-    const stored = await AsyncStorage.getItem('userData');
+    const stored = await AsyncStorage.getItem('@poth_user');
     const token = stored ? JSON.parse(stored)?.token : '';
 
     const response = await fetch(`${API_URL}/${id}`, {

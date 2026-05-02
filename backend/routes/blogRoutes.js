@@ -14,13 +14,13 @@ const {
 } = require('../controllers/blogController');
 
 router.route('/')
-    .post(protect, isShopOwner, upload.single('coverImage'), createBlog)
+    .post(protect, upload.single('coverImage'), createBlog)
     .get(getBlogs);
 
 router.route('/:id')
     .get(getBlogById)
-    .put(protect, isShopOwner, upload.single('coverImage'), updateBlog)
-    .delete(protect, isShopOwner, deleteBlog);
+    .put(protect, upload.single('coverImage'), updateBlog)
+    .delete(protect, deleteBlog);
 
 // ─── New: Likes & Comments (any logged-in user) ───────────────────────────────
 router.route('/:id/like').post(protect, toggleLike);

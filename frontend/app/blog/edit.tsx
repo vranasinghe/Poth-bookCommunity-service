@@ -23,7 +23,7 @@ export default function EditBlog() {
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [author, setAuthor] = useState('');
+    const [penName, setPenName] = useState('');
     const [existingImage, setExistingImage] = useState(null); // filename from server
     const [newImage, setNewImage] = useState<SelectedImage | null>(null);           // newly picked local image
     const [loading, setLoading] = useState(true);
@@ -36,9 +36,10 @@ export default function EditBlog() {
                 const response = await getBlogById(blogId as string);
                 setTitle(response.data.title);
                 setContent(response.data.content);
-                setAuthor(response.data.author);
+                setPenName(response.data.penName || '');
                 setExistingImage(response.data.coverImage || null);
             } catch (error) {
+                console.error('Fetch blog error:', error);
                 Alert.alert('Error', 'Could not fetch blog details');
                 router.back();
             } finally {
@@ -46,7 +47,7 @@ export default function EditBlog() {
             }
         };
         if (id) fetchBlog();
-    }, [id]);
+    }, [id, router]);
 
     const handleImageSelect = () => {
         Alert.alert('Change Cover Image', 'Choose a source', [
@@ -95,8 +96,8 @@ export default function EditBlog() {
     };
 
     const handleUpdate = async () => {
-        if (!title || !content || !author) {
-            Alert.alert('Missing Fields', 'Please fill all fields.');
+        if (!title || !content) {
+            Alert.alert('Missing Fields', 'Please fill in title and content.');
             return;
         }
         setUpdating(true);
@@ -104,7 +105,7 @@ export default function EditBlog() {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('content', content);
-            formData.append('author', author);
+            if (penName) formData.append('penName', penName);
             if (newImage) {
                 formData.append('coverImage', {
                     uri: newImage.uri,
@@ -170,7 +171,7 @@ export default function EditBlog() {
             )}
 
             <TextInput style={styles.input} placeholder="Title" value={title} onChangeText={setTitle} />
-            <TextInput style={styles.input} placeholder="Author" value={author} onChangeText={setAuthor} />
+            <TextInput style={styles.input} placeholder="Pen Name (Optional)" value={penName} onChangeText={setPenName} />
             <TextInput
                 style={[styles.input, styles.textArea]}
                 placeholder="Content"

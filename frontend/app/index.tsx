@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/theme';
 
-const { width, height } = Dimensions.get('window');
+// const { width, height } = Dimensions.get('window');
 
 export default function LoadingScreen() {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function LoadingScreen() {
       router.replace('/auth');
     }, 3000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [router]);
 
   return (
     <LinearGradient

@@ -1,21 +1,20 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, SafeAreaView, ScrollView, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../../src/context/AuthContext';
 import { createOrderAPI } from '../../src/api/orderApi';
 import { getBookByIdAPI } from '../../src/api/bookApi';
-import { useLocalSearchParams } from 'expo-router';
 
 export default function CreateOrderScreen() {
     const { user } = useContext(AuthContext);
     const router = useRouter();
     const params = useLocalSearchParams();
     
-    const [bookId, setBookId] = useState(params.bookId || "64a2b9f0d11c7b8c8d839222");
-    const [shopId, setShopId] = useState(params.shopId || "64a2b9f0d11c7b8c8d839211");
-    const [bookDetails, setBookDetails] = useState(null);
+    const bookId = (Array.isArray(params.bookId) ? params.bookId[0] : params.bookId) || "64a2b9f0d11c7b8c8d839222";
+    const shopId = (Array.isArray(params.shopId) ? params.shopId[0] : params.shopId) || "64a2b9f0d11c7b8c8d839211";
+    const [bookDetails, setBookDetails] = useState<any>(null);
 
     const [quantity, setQuantity] = useState('1');
     const [address, setAddress] = useState('');
@@ -29,7 +28,9 @@ export default function CreateOrderScreen() {
                     const res = await getBookByIdAPI(bookId);
                     setBookDetails(res.data);
                 }
-            } catch (err) {}
+            } catch (err) {
+                console.error("Failed to fetch book in order creation:", err);
+            }
         };
         fetchBook();
     }, [bookId]);
@@ -61,7 +62,7 @@ export default function CreateOrderScreen() {
                     { text: "OK", onPress: () => router.replace('/orders') }
                 ]);
             }
-        } catch (error) {
+        } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message || "Failed to create order";
             if (Platform.OS === 'web') { window.alert(`Error: ${errorMsg}`); }
             else { Alert.alert("Error", errorMsg); }

@@ -2,10 +2,14 @@ const Blog = require('../models/Blog');
 
 const createBlog = async (req, res) => {
     try {
-        const { title, content, author } = req.body;
+        const { title, content, penName } = req.body;
         // If a cover image was uploaded, save its filename
         const coverImage = req.file ? req.file.path : null;
-        const newBlog = new Blog({ title, content, author, coverImage });
+        
+        const author = req.user.firstName + (req.user.lastName ? ' ' + req.user.lastName : '');
+        const authorId = req.user._id;
+
+        const newBlog = new Blog({ title, content, author, authorId, penName, coverImage });
         await newBlog.save();
         res.status(201).json(newBlog);
     } catch (error) {
@@ -34,7 +38,18 @@ const getBlogById = async (req, res) => {
 
 const updateBlog = async (req, res) => {
     try {
+        const blog = await Blog.findById(req.params.id);
+        if (!blog) return res.status(404).json({ message: 'Blog not found' });
+
+        if (blog.authorId.toString() !== req.user._id.toString() && req.user.userType !== 'Shop Owner') {
+            return res.status(403).json({ message: 'Not authorized to update this blog' });
+        }
+
         const updateData = { ...req.body };
+        // Prevent changing author/authorId explicitly
+        delete updateData.authorId;
+        delete updateData.author;
+
         // If a new cover image was uploaded, update it
         if (req.file) {
             updateData.coverImage = req.file.path;
@@ -44,7 +59,6 @@ const updateBlog = async (req, res) => {
             updateData,
             { new: true }
         );
-        if (!updatedBlog) return res.status(404).json({ message: 'Blog not found' });
         res.status(200).json(updatedBlog);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -53,8 +67,14 @@ const updateBlog = async (req, res) => {
 
 const deleteBlog = async (req, res) => {
     try {
-        const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
-        if (!deletedBlog) return res.status(404).json({ message: 'Blog not found' });
+        const blog = await Blog.findById(req.params.id);
+        if (!blog) return res.status(404).json({ message: 'Blog not found' });
+
+        if (blog.authorId.toString() !== req.user._id.toString() && req.user.userType !== 'Shop Owner') {
+            return res.status(403).json({ message: 'Not authorized to delete this blog' });
+        }
+
+        await Blog.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: 'Blog deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });

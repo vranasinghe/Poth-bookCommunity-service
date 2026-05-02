@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { Colors } from '../../constants/theme';
 import { AuthContext } from '../../src/context/AuthContext';
-import { getShopByIdAPI } from '../../src/api/shopApi';
+import { getShopByIdAPI, updateShopAPI, deleteShopAPI, toggleFollowShopAPI } from '../../src/api/shopApi';
 import { getReviewsAPI, addReviewAPI } from '../../src/api/reviewApi';
 import { Button } from '../../components/Button';
 
@@ -27,6 +27,31 @@ export default function ShopDetailsScreen() {
   const [comment, setComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // Edit State
+  const [isEditing, setIsEditing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editedShop, setEditedShop] = useState({
+      name: '',
+      description: '',
+      contactNumber: ''
+  });
+  const [newShopImage, setNewShopImage] = useState<string | null>(null);
+
+  const isOwner = user?._id === shop?.shopOwner?._id || user?._id === shop?.shopOwner;
+
+  const pickShopImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') return;
+    const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 0.8,
+    });
+    if (!result.canceled) setNewShopImage(result.assets[0].uri);
+  };
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -50,6 +75,14 @@ export default function ShopDetailsScreen() {
       try {
         const shopRes = await getShopByIdAPI(id);
         setShop(shopRes.data);
+        if (user && shopRes.data.followers) {
+            setIsFollowing(shopRes.data.followers.includes(user._id));
+        }
+        setEditedShop({
+            name: shopRes.data.name,
+            description: shopRes.data.description,
+            contactNumber: shopRes.data.contactNumber
+        });
         const reviewsRes = await getReviewsAPI(id);
         setReviews(reviewsRes.data);
       } catch (error) {
@@ -61,6 +94,88 @@ export default function ShopDetailsScreen() {
     };
     fetchData();
   }, [id]);
+
+  const handleUpdate = async () => {
+      if (!user?.token) return;
+      setEditLoading(true);
+      try {
+          const formData = new FormData();
+          formData.append('name', editedShop.name);
+          formData.append('description', editedShop.description);
+          formData.append('contactNumber', editedShop.contactNumber);
+          
+          if (newShopImage) {
+              const filename = newShopImage.split('/').pop() || 'photo.jpg';
+              const match = /\.([a-zA-Z]+)$/.exec(filename);
+              const type = match ? `image/${match[1].toLowerCase()}` : 'image/jpeg';
+              formData.append('image', { uri: newShopImage, name: filename, type } as any);
+          }
+
+          const response = await updateShopAPI(id as string, formData, user.token);
+          setShop(response.data);
+          setIsEditing(false);
+          setNewShopImage(null);
+          Alert.alert("Success", "Shop updated successfully");
+      } catch (error: any) {
+          Alert.alert("Error", error.response?.data?.message || "Update failed");
+      } finally {
+          setEditLoading(false);
+      }
+  };
+
+  const handleDelete = () => {
+    console.log("Delete button pressed!");
+    if (Platform.OS === 'web') {
+      window.alert("Diagnostic: Delete button clicked");
+      if (window.confirm("Are you sure you want to delete this shop? This action cannot be undone.")) {
+        confirmDelete();
+      }
+    } else {
+      Alert.alert("Diagnostic", "Delete button clicked");
+      Alert.alert(
+        "Delete Shop",
+        "Are you sure you want to delete this shop? This action cannot be undone.",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Delete", style: "destructive", onPress: confirmDelete }
+        ]
+      );
+    }
+  };
+
+  const confirmDelete = async () => {
+      if (!user?.token || !id) {
+          Alert.alert("Error", "Missing authentication or shop ID");
+          return;
+      }
+      try {
+          console.log(`Frontend: Attempting to delete shop ${id}`);
+          const response = await deleteShopAPI(id as string, user.token);
+          console.log("Frontend: Delete success", response.data);
+          router.replace({
+              pathname: '/owner/dashboard',
+              params: { deletedMessage: `${shop?.name || 'The shop'} was deleted` }
+          } as any);
+      } catch (error: any) {
+          console.error("Frontend: Delete error", error);
+          const msg = error.response?.data?.message || error.message || "Delete failed";
+          Alert.alert("Error", msg);
+      }
+  };
+
+  const handleToggleFollow = async () => {
+    if (!user?.token) {
+        Alert.alert("Authentication Required", "Please login to follow this shop.");
+        return;
+    }
+    try {
+        const res = await toggleFollowShopAPI(id as string, user.token);
+        setIsFollowing(res.data.followed);
+        Alert.alert(res.data.followed ? "Followed" : "Unfollowed", res.data.followed ? `You are now following ${shop.name}!` : `You unfollowed ${shop.name}.`);
+    } catch (error: any) {
+        Alert.alert("Error", "Could not update follow status");
+    }
+  };
 
   const handleSubmitReview = async () => {
       if (!user?.token) {
@@ -110,15 +225,28 @@ export default function ShopDetailsScreen() {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       {/* Top Image & Overlay */}
-      <ImageBackground source={{ uri: shop.imageUrl }} style={styles.topImage}>
+      <ImageBackground source={{ uri: newShopImage || shop.imageUrl }} style={styles.topImage}>
         <SafeAreaView>
           <View style={styles.topNav}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
               <Ionicons name="chevron-back" size={24} color="white" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bookmarkButton}>
-              <Ionicons name="heart-outline" size={24} color="white" />
-            </TouchableOpacity>
+            {!isEditing && isOwner && (
+                <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
+                        <Ionicons name="create-outline" size={24} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.editButton, {backgroundColor: 'rgba(231, 76, 60, 0.7)'}]} onPress={handleDelete}>
+                        <Ionicons name="trash-outline" size={24} color="white" />
+                    </TouchableOpacity>
+                </View>
+            )}
+            {!isEditing && !isOwner && (
+                <TouchableOpacity style={styles.followButton} onPress={handleToggleFollow}>
+                  <Text style={styles.followButtonText}>{isFollowing ? 'Following' : 'Follow'}</Text>
+                  <Ionicons name={isFollowing ? "checkmark-circle" : "add-circle-outline"} size={18} color="white" />
+                </TouchableOpacity>
+            )}
           </View>
         </SafeAreaView>
 
@@ -126,7 +254,17 @@ export default function ShopDetailsScreen() {
           <BlurView intensity={30} style={styles.glassBlur} tint="dark">
              <View style={styles.shopInfoRow}>
                 <View style={styles.mainInfo}>
-                   <Text style={styles.title}>{shop.name}</Text>
+                   {isEditing ? (
+                       <TextInput 
+                        style={styles.editTitleInput}
+                        value={editedShop.name}
+                        onChangeText={t => setEditedShop({...editedShop, name: t})}
+                        placeholder="Shop Name"
+                        placeholderTextColor="rgba(255,255,255,0.5)"
+                       />
+                   ) : (
+                       <Text style={styles.title}>{shop.name}</Text>
+                   )}
                    <View style={styles.authorRow}>
                       <Ionicons name="location-outline" size={16} color="rgba(255,255,255,0.7)" />
                       <Text style={styles.authorText}>{shop.location}</Text>
@@ -157,12 +295,48 @@ export default function ShopDetailsScreen() {
             <View style={styles.metaRow}>
                 <View style={styles.statusBadge}>
                     <Ionicons name="call-outline" size={18} color="#666" />
-                    <Text style={styles.statusText}>{shop.contactNumber}</Text>
+                    {isEditing ? (
+                        <TextInput 
+                            style={styles.editInputInline}
+                            value={editedShop.contactNumber}
+                            onChangeText={t => setEditedShop({...editedShop, contactNumber: t})}
+                            placeholder="Contact Number"
+                        />
+                    ) : (
+                        <Text style={styles.statusText}>{shop.contactNumber}</Text>
+                    )}
                 </View>
+                {isEditing && (
+                    <TouchableOpacity style={styles.changeImgBtn} onPress={pickShopImage}>
+                        <Ionicons name="camera" size={18} color="#007bff" />
+                        <Text style={{color: '#007bff', fontWeight: 'bold'}}>Image</Text>
+                    </TouchableOpacity>
+                )}
             </View>
-            <Text style={styles.description}>
-                {shop.description}
-            </Text>
+            
+            {isEditing ? (
+                <TextInput 
+                    style={[styles.description, styles.editTextArea]}
+                    value={editedShop.description}
+                    onChangeText={t => setEditedShop({...editedShop, description: t})}
+                    multiline
+                    placeholder="Description"
+                />
+            ) : (
+                <Text style={styles.description}>
+                    {shop.description}
+                </Text>
+            )}
+
+            {isEditing && (
+                <View style={styles.editActions}>
+                    <Button title={editLoading ? "Saving..." : "Save Changes"} onPress={handleUpdate} disabled={editLoading} />
+                    <TouchableOpacity onPress={() => { setIsEditing(false); setNewShopImage(null); }} style={styles.cancelBtn}>
+                        <Text style={styles.cancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+            
             <View style={{ height: 100 }} />
             </ScrollView>
         )}
@@ -272,13 +446,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  bookmarkButton: {
-    width: 44,
+  followButton: {
+    flexDirection: 'row',
+    gap: 6,
     height: 44,
+    paddingHorizontal: 16,
     backgroundColor: 'rgba(0,0,0,0.3)',
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  followButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 14
   },
   glassContainer: {
     margin: 20,
@@ -460,5 +641,62 @@ const styles = StyleSheet.create({
       height: 180,
       borderRadius: 10,
       marginTop: 12,
+  },
+  editButton: {
+      width: 44,
+      height: 44,
+      backgroundColor: 'rgba(52, 152, 219, 0.7)',
+      borderRadius: 22,
+      justifyContent: 'center',
+      alignItems: 'center',
+  },
+  editTitleInput: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: '#FFFFFF',
+      borderBottomWidth: 1,
+      borderBottomColor: 'rgba(255,255,255,0.3)',
+      marginBottom: 8,
+      padding: 0,
+  },
+  editInputInline: {
+      fontSize: 16,
+      color: '#333',
+      fontWeight: '600',
+      borderBottomWidth: 1,
+      borderBottomColor: '#CCC',
+      padding: 0,
+      minWidth: 150,
+  },
+  changeImgBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+      backgroundColor: '#EBF4FF',
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 8,
+  },
+  editTextArea: {
+      backgroundColor: '#F9F9F9',
+      borderWidth: 1,
+      borderColor: '#DDD',
+      borderRadius: 12,
+      padding: 10,
+      minHeight: 120,
+      textAlignVertical: 'top',
+  },
+  editActions: {
+      marginTop: 20,
+      gap: 10,
+  },
+  cancelBtn: {
+      alignItems: 'center',
+      paddingVertical: 12,
+  },
+  cancelText: {
+      color: '#E74C3C',
+      fontWeight: 'bold',
+      fontSize: 16,
   },
 });

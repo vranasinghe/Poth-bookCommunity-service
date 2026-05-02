@@ -40,6 +40,7 @@ export default function AccountScreen() {
         setIsEditing(false);
         Alert.alert("Success", "Profile updated successfully");
     } catch (error) {
+        console.error("Update profile error:", error);
         Alert.alert("Error", "Could not update profile");
     }
   };
@@ -51,6 +52,7 @@ export default function AccountScreen() {
               await deleteUserAPI(user.token);
               await logoutContext();
           } catch (error) {
+              console.error("Delete account error:", error);
               Alert.alert("Error", "Could not delete account");
           }
       };
