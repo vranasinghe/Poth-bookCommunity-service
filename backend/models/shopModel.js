@@ -26,6 +26,10 @@ const shopSchema = new mongoose.Schema({
         type: String,
         default: 'https://via.placeholder.com/150'
     },
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
     averageRating: {
         type: Number,
         default: 0

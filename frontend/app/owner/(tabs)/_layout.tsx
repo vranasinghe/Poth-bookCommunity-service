@@ -62,11 +62,11 @@ export default function OwnerTabLayout() {
         }}
       />
       <Tabs.Screen
-        name="alerts"
+        name="report"
         options={{
-          title: 'Alerts',
+          title: 'Reports',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "notifications" : "notifications-outline"} size={24} color={color} />
+            <Ionicons name={focused ? "document-text" : "document-text-outline"} size={24} color={color} />
           ),
         }}
       />

@@ -40,3 +40,9 @@ export const deleteShopAPI = async (id, token) => {
         headers: { Authorization: `Bearer ${token}` }
     });
 };
+
+export const toggleFollowShopAPI = async (id, token) => {
+    return await axios.post(`${API_URL}/${id}/follow`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};

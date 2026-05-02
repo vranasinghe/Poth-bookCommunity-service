@@ -1,0 +1,85 @@
+const Report = require('../models/reportModel');
+const Book = require('../models/bookModel');
+const Shop = require('../models/shopModel');
+
+// @desc    Preview a stock report for a shop
+// @route   GET /api/reports/preview/:shopId
+// @access  Private (Shop Owner)
+const previewReport = async (req, res) => {
+    try {
+        const shop = await Shop.findById(req.params.shopId);
+        if (!shop) return res.status(404).json({ message: 'Shop not found' });
+        
+        if (shop.shopOwner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized' });
+        }
+
+        const books = await Book.find({ shop: shop._id });
+        const breakdown = books.map(book => ({
+            bookName: book.title,
+            stockAmount: book.stockCount
+        }));
+
+        res.status(200).json({ breakdown, shopName: shop.name });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Create a new report
+// @route   POST /api/reports/:shopId
+// @access  Private (Shop Owner)
+const createReport = async (req, res) => {
+    try {
+        const { title, notes } = req.body;
+        const shop = await Shop.findById(req.params.shopId);
+        if (!shop) return res.status(404).json({ message: 'Shop not found' });
+
+        if (shop.shopOwner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized' });
+        }
+
+        const books = await Book.find({ shop: shop._id });
+        const breakdown = books.map(book => ({
+            bookName: book.title,
+            stockAmount: book.stockCount
+        }));
+
+        const imageUrl = req.file ? req.file.path : null;
+
+        const report = await Report.create({
+            shopId: shop._id,
+            shopName: shop.name,
+            title,
+            notes,
+            imageUrl,
+            breakdown
+        });
+
+        res.status(201).json(report);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get reports for shops the user follows
+// @route   GET /api/reports
+// @access  Private
+const getMyReports = async (req, res) => {
+    try {
+        // Find shops the user follows
+        const shops = await Shop.find({ followers: req.user._id });
+        const shopIds = shops.map(s => s._id);
+
+        const reports = await Report.find({ shopId: { $in: shopIds } }).sort({ createdAt: -1 });
+        res.status(200).json(reports);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = {
+    previewReport,
+    createReport,
+    getMyReports
+};

@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { Colors } from '../../constants/theme';
 import { AuthContext } from '../../src/context/AuthContext';
-import { getShopByIdAPI, updateShopAPI, deleteShopAPI } from '../../src/api/shopApi';
+import { getShopByIdAPI, updateShopAPI, deleteShopAPI, toggleFollowShopAPI } from '../../src/api/shopApi';
 import { getReviewsAPI, addReviewAPI } from '../../src/api/reviewApi';
 import { Button } from '../../components/Button';
 
@@ -30,6 +30,7 @@ export default function ShopDetailsScreen() {
 
   // Edit State
   const [isEditing, setIsEditing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [editedShop, setEditedShop] = useState({
       name: '',
@@ -74,6 +75,9 @@ export default function ShopDetailsScreen() {
       try {
         const shopRes = await getShopByIdAPI(id);
         setShop(shopRes.data);
+        if (user && shopRes.data.followers) {
+            setIsFollowing(shopRes.data.followers.includes(user._id));
+        }
         setEditedShop({
             name: shopRes.data.name,
             description: shopRes.data.description,
@@ -159,6 +163,20 @@ export default function ShopDetailsScreen() {
       }
   };
 
+  const handleToggleFollow = async () => {
+    if (!user?.token) {
+        Alert.alert("Authentication Required", "Please login to follow this shop.");
+        return;
+    }
+    try {
+        const res = await toggleFollowShopAPI(id as string, user.token);
+        setIsFollowing(res.data.followed);
+        Alert.alert(res.data.followed ? "Followed" : "Unfollowed", res.data.followed ? `You are now following ${shop.name}!` : `You unfollowed ${shop.name}.`);
+    } catch (error: any) {
+        Alert.alert("Error", "Could not update follow status");
+    }
+  };
+
   const handleSubmitReview = async () => {
       if (!user?.token) {
           Alert.alert("Authentication Required", "Please login to leave a review.");
@@ -224,8 +242,9 @@ export default function ShopDetailsScreen() {
                 </View>
             )}
             {!isEditing && !isOwner && (
-                <TouchableOpacity style={styles.bookmarkButton}>
-                  <Ionicons name="heart-outline" size={24} color="white" />
+                <TouchableOpacity style={styles.followButton} onPress={handleToggleFollow}>
+                  <Text style={styles.followButtonText}>{isFollowing ? 'Following' : 'Follow'}</Text>
+                  <Ionicons name={isFollowing ? "checkmark-circle" : "add-circle-outline"} size={18} color="white" />
                 </TouchableOpacity>
             )}
           </View>
@@ -427,13 +446,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  bookmarkButton: {
-    width: 44,
+  followButton: {
+    flexDirection: 'row',
+    gap: 6,
     height: 44,
+    paddingHorizontal: 16,
     backgroundColor: 'rgba(0,0,0,0.3)',
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  followButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 14
   },
   glassContainer: {
     margin: 20,

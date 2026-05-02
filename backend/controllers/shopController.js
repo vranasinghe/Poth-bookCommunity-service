@@ -127,11 +127,38 @@ const deleteShop = async (req, res) => {
     }
 };
 
+// @desc    Toggle follow shop
+// @route   POST /api/shops/:id/follow
+// @access  Private
+const toggleFollowShop = async (req, res) => {
+    try {
+        const shop = await Shop.findById(req.params.id);
+        if (!shop) {
+            return res.status(404).json({ message: 'Shop not found' });
+        }
+
+        const userId = req.user._id;
+        const alreadyFollowing = shop.followers.some(id => id.equals(userId));
+
+        if (alreadyFollowing) {
+            shop.followers = shop.followers.filter(id => !id.equals(userId));
+        } else {
+            shop.followers.push(userId);
+        }
+
+        await shop.save();
+        res.status(200).json({ followersCount: shop.followers.length, followed: !alreadyFollowing });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getShops,
     getShopById,
     createShop,
     getShopsByOwner,
     updateShop,
-    deleteShop
+    deleteShop,
+    toggleFollowShop
 };

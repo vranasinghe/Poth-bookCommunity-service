@@ -333,6 +333,9 @@ const styles = StyleSheet.create({
   actionButtonSecondary: {
     backgroundColor: '#E8EDF2',
   },
+  actionButtonTertiary: {
+    backgroundColor: '#27ae60', // green highlight
+  },
   actionText: {
     color: 'white',
     fontSize: 14,
