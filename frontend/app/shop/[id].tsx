@@ -32,12 +32,24 @@ export default function ShopDetailsScreen() {
   const [isEditing, setIsEditing] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [contactNumberError, setContactNumberError] = useState('');
   const [editedShop, setEditedShop] = useState({
       name: '',
       description: '',
       contactNumber: ''
   });
   const [newShopImage, setNewShopImage] = useState<string | null>(null);
+
+  const handleEditContactNumber = (val: string) => {
+    const digits = val.replace(/[^0-9]/g, '');
+    const capped = digits.slice(0, 10);
+    setEditedShop({ ...editedShop, contactNumber: capped });
+    if (capped.length > 0 && capped.length < 10) {
+      setContactNumberError('Must be exactly 10 digits');
+    } else {
+      setContactNumberError('');
+    }
+  };
 
   const isOwner = user?._id === shop?.shopOwner?._id || user?._id === shop?.shopOwner;
 
@@ -97,6 +109,13 @@ export default function ShopDetailsScreen() {
 
   const handleUpdate = async () => {
       if (!user?.token) return;
+
+      if (editedShop.contactNumber.length !== 10) {
+          setContactNumberError('Contact number must be exactly 10 digits');
+          Alert.alert('Validation Error', 'Contact number must be exactly 10 digits (numbers only)');
+          return;
+      }
+
       setEditLoading(true);
       try {
           const formData = new FormData();
@@ -153,7 +172,7 @@ export default function ShopDetailsScreen() {
           const response = await deleteShopAPI(id as string, user.token);
           console.log("Frontend: Delete success", response.data);
           router.replace({
-              pathname: '/owner/dashboard',
+              pathname: '/owner',
               params: { deletedMessage: `${shop?.name || 'The shop'} was deleted` }
           } as any);
       } catch (error: any) {
@@ -296,12 +315,21 @@ export default function ShopDetailsScreen() {
                 <View style={styles.statusBadge}>
                     <Ionicons name="call-outline" size={18} color="#666" />
                     {isEditing ? (
-                        <TextInput 
-                            style={styles.editInputInline}
-                            value={editedShop.contactNumber}
-                            onChangeText={t => setEditedShop({...editedShop, contactNumber: t})}
-                            placeholder="Contact Number"
-                        />
+                        <>
+                          <TextInput 
+                              style={[styles.editInputInline, contactNumberError ? { borderBottomColor: '#E74C3C' } : null]}
+                              value={editedShop.contactNumber}
+                              onChangeText={handleEditContactNumber}
+                              placeholder="10-digit number"
+                              keyboardType="numeric"
+                              maxLength={10}
+                          />
+                          {contactNumberError ? (
+                              <Text style={{ color: '#E74C3C', fontSize: 10, marginTop: 2 }}>{contactNumberError}</Text>
+                          ) : (
+                              <Text style={{ color: '#999', fontSize: 10, marginTop: 2 }}>{editedShop.contactNumber.length}/10</Text>
+                          )}
+                        </>
                     ) : (
                         <Text style={styles.statusText}>{shop.contactNumber}</Text>
                     )}

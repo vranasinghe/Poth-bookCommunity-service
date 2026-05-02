@@ -1,4 +1,6 @@
 const Shop = require('../models/shopModel');
+const Book = require('../models/bookModel');
+const Review = require('../models/reviewModel');
 
 // @desc    Get all shops
 // @route   GET /api/shops
@@ -119,8 +121,25 @@ const deleteShop = async (req, res) => {
             return res.status(404).json({ message: 'Shop not found or not authorized' });
         }
         
+        // Cascading delete: Remove all books associated with this shop
+        const deletedBooks = await Book.find({ shop: deletedShop._id });
+        const bookIds = deletedBooks.map(book => book._id);
+        
+        if (bookIds.length > 0) {
+            await Book.deleteMany({ _id: { $in: bookIds } });
+            console.log(`[DELETE SHOP] Deleted ${bookIds.length} books associated with shop ${deletedShop._id}`);
+            
+            // Remove reviews for those books
+            await Review.deleteMany({ targetId: { $in: bookIds }, targetModel: 'Book' });
+            console.log(`[DELETE SHOP] Deleted reviews for books associated with shop ${deletedShop._id}`);
+        }
+
+        // Remove reviews for the shop itself
+        await Review.deleteMany({ targetId: deletedShop._id, targetModel: 'Shop' });
+        console.log(`[DELETE SHOP] Deleted reviews for shop ${deletedShop._id}`);
+
         console.log(`[DELETE SHOP] Success. ID: ${req.params.id}`);
-        res.status(200).json({ message: 'Shop removed successfully' });
+        res.status(200).json({ message: 'Shop and all associated content removed successfully' });
     } catch (error) {
         console.error('[DELETE SHOP] Error:', error);
         res.status(500).json({ message: error.message });

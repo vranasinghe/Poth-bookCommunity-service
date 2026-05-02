@@ -27,12 +27,26 @@ export default function RegisterShopScreen() {
 
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState<string | null>(null);
+  const [contactNumberError, setContactNumberError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     location: '',
     contactNumber: '',
   });
+
+  const handleContactNumber = (val: string) => {
+    // Strip everything that is not a digit
+    const digits = val.replace(/[^0-9]/g, '');
+    // Cap at 10 digits
+    const capped = digits.slice(0, 10);
+    setFormData({ ...formData, contactNumber: capped });
+    if (capped.length > 0 && capped.length < 10) {
+      setContactNumberError('Contact number must be exactly 10 digits');
+    } else {
+      setContactNumberError('');
+    }
+  };
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -58,6 +72,12 @@ export default function RegisterShopScreen() {
 
     if (!name || !description || !location || !contactNumber) {
       Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+
+    if (contactNumber.length !== 10) {
+      setContactNumberError('Contact number must be exactly 10 digits');
+      Alert.alert('Validation Error', 'Contact number must be exactly 10 digits (numbers only)');
       return;
     }
 
@@ -131,12 +151,18 @@ export default function RegisterShopScreen() {
 
             <Text style={styles.label}>Contact Number</Text>
             <TextInput 
-              style={styles.input}
-              placeholder="e.g. +94 77 123 4567"
-              keyboardType="phone-pad"
+              style={[styles.input, contactNumberError ? styles.inputError : null]}
+              placeholder="10-digit number (e.g. 0771234567)"
+              keyboardType="numeric"
+              maxLength={10}
               value={formData.contactNumber}
-              onChangeText={(val) => setFormData({...formData, contactNumber: val})}
+              onChangeText={handleContactNumber}
             />
+            {contactNumberError ? (
+              <Text style={styles.errorText}>{contactNumberError}</Text>
+            ) : (
+              <Text style={styles.hintText}>{formData.contactNumber.length}/10 digits</Text>
+            )}
 
             <Text style={styles.label}>Shop Image</Text>
             <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
@@ -217,6 +243,23 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     color: '#333',
+  },
+  inputError: {
+    borderColor: '#E74C3C',
+    borderWidth: 1.5,
+  },
+  errorText: {
+    color: '#E74C3C',
+    fontSize: 12,
+    marginTop: 5,
+    marginLeft: 4,
+    fontWeight: '600',
+  },
+  hintText: {
+    color: '#999',
+    fontSize: 12,
+    marginTop: 5,
+    marginLeft: 4,
   },
   textArea: {
     height: 100,
