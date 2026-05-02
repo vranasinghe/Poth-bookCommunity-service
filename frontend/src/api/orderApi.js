@@ -6,9 +6,9 @@ const API_URL = `${API_BASE_URL}/api/orders`;
 
 // Create a new order
 export const createOrderAPI = async (orderData) => {
-    // If orderData is FormData, axios will set the correct headers automatically
+    // If orderData is FormData, axios will set the correct headers automatically including boundary
     return await axios.post(`${API_URL}`, orderData, { 
-        headers: orderData instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : JSON_HEADERS 
+        headers: orderData instanceof FormData ? {} : JSON_HEADERS 
     });
 };
 

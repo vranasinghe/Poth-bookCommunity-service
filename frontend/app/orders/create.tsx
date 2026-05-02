@@ -68,17 +68,23 @@ export default function CreateOrderScreen() {
         formData.append('deliveryDetails', JSON.stringify({ address, city, phone }));
         
         if (image) {
-            const uri = image.uri;
-            const name = uri.split('/').pop();
-            const match = /\.(\w+)$/.exec(name || '');
-            const type = match ? `image/${match[1]}` : `image`;
-            
-            // @ts-ignore
-            formData.append('paymentSlip', {
-                uri: Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
-                name: name,
-                type: type,
-            });
+            if (Platform.OS === 'web') {
+                const response = await fetch(image.uri);
+                const blob = await response.blob();
+                formData.append('paymentSlip', blob, 'paymentSlip.jpg');
+            } else {
+                const uri = image.uri;
+                const name = uri.split('/').pop();
+                const match = /\.(\w+)$/.exec(name || '');
+                const type = match ? `image/${match[1]}` : `image`;
+                
+                // @ts-ignore
+                formData.append('paymentSlip', {
+                    uri: Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
+                    name: name,
+                    type: type,
+                });
+            }
         }
 
         try {
