@@ -35,6 +35,10 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'],
         default: 'Pending'
+    },
+    paymentSlipUrl: {
+        type: String,
+        required: [true, 'Please upload a payment slip']
     }
 }, {
     timestamps: true
