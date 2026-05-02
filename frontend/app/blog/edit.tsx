@@ -50,6 +50,11 @@ export default function EditBlog() {
     }, [id, router]);
 
     const handleImageSelect = () => {
+        if (Platform.OS === 'web') {
+            openGallery();
+            return;
+        }
+
         Alert.alert('Change Cover Image', 'Choose a source', [
             { text: '📷 Take Photo', onPress: openCamera },
             { text: '🖼️ Choose from Gallery', onPress: openGallery },

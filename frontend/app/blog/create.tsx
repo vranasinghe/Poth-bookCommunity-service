@@ -24,6 +24,11 @@ export default function CreateBlog() {
     const [loading, setLoading] = useState(false);
 
     const handleImageSelect = () => {
+        if (Platform.OS === 'web') {
+            openGallery();
+            return;
+        }
+
         Alert.alert(
             'Add Cover Image',
             'Choose a source',
