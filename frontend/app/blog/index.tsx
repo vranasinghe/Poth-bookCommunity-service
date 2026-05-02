@@ -6,34 +6,37 @@ import { useAuth } from '../../src/context/AuthContext';
 
 export default function BlogList() {
     const router = useRouter();
-    const { isShopOwner } = useAuth();
-    const [blogs, setBlogs] = useState([]);
+    const { user } = useAuth();
+    const [blogs, setBlogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Guard: redirect non-Shop-Owners away
+    // Guard: ensure user is logged in
     useEffect(() => {
-        if (!isShopOwner) {
-            Alert.alert('Access Denied', 'Only registered Shop Owners can manage blogs.', [
+        if (!user) {
+            Alert.alert('Access Denied', 'Please log in to manage your blogs.', [
                 { text: 'OK', onPress: () => router.replace('/') }
             ]);
         }
-    }, [isShopOwner, router]);
+    }, [user, router]);
 
     const fetchBlogs = useCallback(async () => {
         setLoading(true);
         try {
             const response = await getBlogs();
-            setBlogs(response.data);
+            if (user) {
+                const myBlogs = response.data.filter((blog: any) => blog.authorId === user._id);
+                setBlogs(myBlogs);
+            }
         } catch (error) {
             console.error('Error fetching blogs:', error);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [user]);
 
     useEffect(() => {
-        if (isShopOwner) fetchBlogs();
-    }, [isShopOwner, fetchBlogs]);
+        if (user) fetchBlogs();
+    }, [user, fetchBlogs]);
 
     const handleDelete = async (id: string) => {
         Alert.alert('Delete Blog', 'Are you sure you want to delete this blog?', [
@@ -78,7 +81,7 @@ export default function BlogList() {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Blog Management</Text>
+                <Text style={styles.headerTitle}>My Blogs</Text>
                 <TouchableOpacity 
                     style={styles.createBtn}
                     onPress={() => router.push('/blog/create')}

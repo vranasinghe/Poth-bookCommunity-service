@@ -18,13 +18,15 @@ interface Blog {
     title: string;
     content: string;
     author: string;
+    authorId?: string;
+    penName?: string;
     coverImage?: string;
     createdAt?: string;
 }
 
 export default function BlogsScreen() {
     const router = useRouter();
-    const { isShopOwner } = useAuth();
+    const { user, isShopOwner } = useAuth();
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -89,7 +91,7 @@ export default function BlogsScreen() {
                 <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
                 <View style={styles.metaRow}>
                     <Ionicons name="person-outline" size={12} color="#666" />
-                    <Text style={styles.cardAuthor}>{item.author}</Text>
+                    <Text style={styles.cardAuthor}>{item.penName || item.author}</Text>
                     <View style={styles.dot} />
                     <Text style={styles.dateText}>
                         {item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
@@ -97,7 +99,7 @@ export default function BlogsScreen() {
                 </View>
                 <Text style={styles.cardSnippet} numberOfLines={2}>{item.content}</Text>
 
-                {isShopOwner && (
+                {(isShopOwner || (user && item.authorId === user._id)) && (
                     <View style={styles.adminActions}>
                         <TouchableOpacity
                             style={[styles.actionBtn, styles.editBtn]}
@@ -127,7 +129,7 @@ export default function BlogsScreen() {
                     <Text style={styles.headerTitle}>Poth Blogs</Text>
                     <Text style={styles.headerSubtitle}>Discover community stories</Text>
                 </View>
-                {isShopOwner && (
+                {user && (
                     <TouchableOpacity
                         style={styles.createBtn}
                         onPress={() => router.push('/blog/create')}

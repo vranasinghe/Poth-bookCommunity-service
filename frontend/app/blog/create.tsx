@@ -19,7 +19,7 @@ export default function CreateBlog() {
     const router = useRouter();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [author, setAuthor] = useState('');
+    const [penName, setPenName] = useState('');
     const [coverImage, setCoverImage] = useState<SelectedImage | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -90,8 +90,8 @@ export default function CreateBlog() {
     };
 
     const handleCreate = async () => {
-        if (!title || !content || !author) {
-            Alert.alert('Missing Fields', 'Please fill in all fields.');
+        if (!title || !content) {
+            Alert.alert('Missing Fields', 'Please fill in title and content.');
             return;
         }
         setLoading(true);
@@ -99,7 +99,7 @@ export default function CreateBlog() {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('content', content);
-            formData.append('author', author);
+            if (penName) formData.append('penName', penName);
             if (coverImage) {
                 formData.append('coverImage', {
                     uri: coverImage.uri,
@@ -149,7 +149,7 @@ export default function CreateBlog() {
             )}
 
             <TextInput style={styles.input} placeholder="Title" value={title} onChangeText={setTitle} />
-            <TextInput style={styles.input} placeholder="Author" value={author} onChangeText={setAuthor} />
+            <TextInput style={styles.input} placeholder="Pen Name (Optional)" value={penName} onChangeText={setPenName} />
             <TextInput
                 style={[styles.input, styles.textArea]}
                 placeholder="Content"
