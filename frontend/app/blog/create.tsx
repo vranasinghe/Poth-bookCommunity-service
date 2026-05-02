@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity,
-    StyleSheet, ActivityIndicator, Image, ScrollView, Alert
+    StyleSheet, ActivityIndicator, Image, ScrollView, Alert, Platform
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -24,6 +24,11 @@ export default function CreateBlog() {
     const [loading, setLoading] = useState(false);
 
     const handleImageSelect = () => {
+        if (Platform.OS === 'web') {
+            openGallery();
+            return;
+        }
+
         Alert.alert(
             'Add Cover Image',
             'Choose a source',
@@ -101,11 +106,17 @@ export default function CreateBlog() {
             formData.append('content', content);
             if (penName) formData.append('penName', penName);
             if (coverImage) {
-                formData.append('coverImage', {
-                    uri: coverImage.uri,
-                    name: coverImage.name,
-                    type: coverImage.type,
-                } as any);
+                if (Platform.OS === 'web') {
+                    const response = await fetch(coverImage.uri);
+                    const blob = await response.blob();
+                    formData.append('coverImage', blob, coverImage.name);
+                } else {
+                    formData.append('coverImage', {
+                        uri: coverImage.uri,
+                        name: coverImage.name,
+                        type: coverImage.type,
+                    } as any);
+                }
             }
             await createBlog(formData);
             Alert.alert('Success ✅', 'Blog published successfully!');
