@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity,
-    StyleSheet, ActivityIndicator, Image, ScrollView, Alert
+    StyleSheet, ActivityIndicator, Image, ScrollView, Alert, Platform
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -107,11 +107,17 @@ export default function EditBlog() {
             formData.append('content', content);
             if (penName) formData.append('penName', penName);
             if (newImage) {
-                formData.append('coverImage', {
-                    uri: newImage.uri,
-                    name: newImage.name,
-                    type: newImage.type,
-                } as any);
+                if (Platform.OS === 'web') {
+                    const response = await fetch(newImage.uri);
+                    const blob = await response.blob();
+                    formData.append('coverImage', blob, newImage.name);
+                } else {
+                    formData.append('coverImage', {
+                        uri: newImage.uri,
+                        name: newImage.name,
+                        type: newImage.type,
+                    } as any);
+                }
             }
             const blogId = Array.isArray(id) ? id[0] : id;
             await updateBlog(blogId as string, formData);
