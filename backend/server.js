@@ -15,7 +15,8 @@ const corsOptions = {
             'http://localhost:8080',
             'http://localhost:8081',
             'http://localhost:5000',
-            'https://poth-bookcommunity-service-production.up.railway.app'
+            'https://poth-bookcommunity-service-production.up.railway.app',
+            'https://poth-bookcommunityservice.netlify.app'
         ];
         // Allow requests with no origin (like mobile apps or curl)
         if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin === '*') {
