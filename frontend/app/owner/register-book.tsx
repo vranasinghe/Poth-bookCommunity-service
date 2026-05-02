@@ -114,7 +114,7 @@ export default function RegisterBookScreen() {
 
       await createBookAPI(data, user?.token);
       Alert.alert('Success', 'Book registered successfully!', [
-        { text: 'OK', onPress: () => router.replace('/owner/dashboard') }
+        { text: 'OK', onPress: () => router.replace('/owner') }
       ]);
     } catch (error: any) {
       console.error(error);
