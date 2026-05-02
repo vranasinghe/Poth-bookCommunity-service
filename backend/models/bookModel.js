@@ -15,7 +15,8 @@ const bookSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        required: [true, 'Please add a price']
+        required: [true, 'Please add a price'],
+        min: [0, 'Price cannot be negative']
     },
     imageUrl: {
         type: String,
@@ -32,7 +33,8 @@ const bookSchema = new mongoose.Schema({
     },
     stockCount: {
         type: Number,
-        default: 0
+        default: 0,
+        min: [0, 'Stock count cannot be negative']
     },
     averageRating: {
         type: Number,

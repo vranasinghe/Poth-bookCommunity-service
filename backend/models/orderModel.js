@@ -23,7 +23,8 @@ const orderSchema = new mongoose.Schema({
     },
     totalPrice: {
         type: Number,
-        required: [true, 'Please add a total price']
+        required: [true, 'Please add a total price'],
+        min: [0, 'Total price cannot be negative']
     },
     deliveryDetails: {
         address: { type: String, required: [true, 'Please add delivery address'] },

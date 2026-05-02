@@ -25,6 +25,23 @@ const addReview = async (req, res) => {
     }
 
     try {
+        // Prevent duplicate reviews
+        const existingReview = await Review.findOne({
+            user: req.user._id,
+            targetId: targetId
+        });
+        if (existingReview) {
+            return res.status(400).json({ message: 'You have already reviewed this item' });
+        }
+
+        // Prevent shop owners from reviewing their own shops
+        if (targetModel === 'Shop') {
+            const shop = await Shop.findById(targetId);
+            if (shop && shop.shopOwner.toString() === req.user._id.toString()) {
+                return res.status(400).json({ message: 'Shop owners cannot review their own shops' });
+            }
+        }
+
         const imageUrl = req.file ? req.file.path : null;
 
         const review = await Review.create({

@@ -20,7 +20,9 @@ const shopSchema = new mongoose.Schema({
     },
     contactNumber: {
         type: String,
-        required: [true, 'Please add a contact number']
+        required: [true, 'Please add a contact number'],
+        minlength: [10, 'Phone number should only contain 10 characters'],
+        maxlength: [10, 'Phone number should only contain 10 characters']
     },
     imageUrl: {
         type: String,
