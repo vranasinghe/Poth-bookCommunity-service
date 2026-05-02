@@ -78,7 +78,7 @@ export default function RegisterShopScreen() {
 
       await createShopAPI(data, user?.token);
       Alert.alert('Success', 'Shop registered successfully!', [
-        { text: 'OK', onPress: () => router.replace('/owner/dashboard') }
+        { text: 'OK', onPress: () => router.replace('/owner') }
       ]);
     } catch (error: any) {
       console.error(error);
