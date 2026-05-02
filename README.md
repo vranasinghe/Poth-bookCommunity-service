@@ -96,21 +96,84 @@ Scan the QR code with the **Expo Go** app, or press `w` to open in the web brows
 
 ---
 
+## Validation & Business Rules
+
+* **Email:** Every user email address must correctly contain an `@` sign.
+* **Password:** Passwords must strictly be more than 8 characters long.
+* **Phone / Contact Number:** Both user phone numbers and shop contact numbers must be exactly 10 characters long.
+* **Prices & Stock Counts:** Items (`price`, `stockCount`, `totalPrice`) cannot have negative values (min 0).
+* **Reviews:** Customers/Shop owners cannot add multiple/duplicate reviews on the same book or shop. Shop owners are strictly forbidden from placing reviews on their own shops.
+
+---
+
 ## API Overview
 
-| Method   | Endpoint                  | Description                              | Auth    |
-| -------- | ------------------------- | ---------------------------------------- | ------- |
-| `POST`   | `/api/users/register`     | Register a new user                      | Public  |
-| `POST`   | `/api/users/login`        | Login and receive a JWT token            | Public  |
-| `GET`    | `/api/shops`              | Get all shops                            | Public  |
-| `POST`   | `/api/shops`              | Create a shop (with optional image)      | Private |
-| `GET`    | `/api/books`              | Get all books                            | Public  |
-| `POST`   | `/api/books`              | Create a book listing (with optional image) | Private |
-| `GET`    | `/api/reviews/:targetId`  | Get all reviews for a shop or book       | Public  |
-| `GET`    | `/api/reviews/me`         | Get the logged-in user's reviews         | Private |
-| `POST`   | `/api/reviews`            | Submit a review (with optional photo)    | Private |
-| `PUT`    | `/api/reviews/:id`        | Update a review                          | Private |
-| `DELETE` | `/api/reviews/:id`        | Delete a review                          | Private |
+### 👤 Users (`/api/users`)
+| Method | Endpoint    | Description | Access |
+| ------ | ----------- | ----------- | ------ |
+| `POST` | `/register` | Register a new user | Public |
+| `POST` | `/login`    | Login and receive a JWT token | Public |
+| `PUT`  | `/profile`  | Update logged in user profile | Protected |
+| `DELETE`| `/profile` | Delete logged in user profile | Protected |
+
+### 🏬 Shops (`/api/shops`)
+| Method | Endpoint      | Description | Access |
+| ------ | ------------- | ----------- | ------ |
+| `GET`  | `/`           | Get all shops | Public |
+| `POST` | `/`           | Create a new shop | Protected |
+| `GET`  | `/owner/me`   | Get shops owned by logged-in user | Protected |
+| `GET`  | `/:id`        | Get specific shop details | Public |
+| `PUT`  | `/:id`        | Update a specific shop | Protected |
+| `DELETE`| `/:id`       | Delete a specific shop | Protected |
+| `POST` | `/:id/follow` | Toggle following a shop | Protected |
+
+### 📚 Books (`/api/books`)
+| Method | Endpoint        | Description | Access |
+| ------ | --------------- | ----------- | ------ |
+| `GET`  | `/`             | Get all books | Public |
+| `POST` | `/`             | Create a new book | Protected |
+| `GET`  | `/owner/me`     | Get books owned by logged-in user | Protected |
+| `GET`  | `/:id`          | Get specific book details | Public |
+| `PUT`  | `/:id`          | Update a specific book | Protected |
+| `DELETE`|`/:id`          | Delete a specific book | Protected |
+| `GET`  | `/shop/:shopId` | Get all books matching a specific shop | Public |
+
+### 📦 Orders (`/api/orders`)
+| Method | Endpoint               | Description | Access |
+| ------ | ---------------------- | ----------- | ------ |
+| `POST` | `/`                    | Create a new order | Public / Protected |
+| `DELETE`| `/:id`                | Delete a specific order | Public / Protected |
+| `PUT`  | `/:id/status`          | Update order's operational status | Public / Protected |
+| `PUT`  | `/:id/delivery`        | Update order's delivery details | Public / Protected |
+| `GET`  | `/reader/:readerId`    | Get orders related to a reader | Public / Protected |
+| `GET`  | `/shop/:shopId`        | Get orders related to a shop | Public / Protected |
+
+### ⭐ Reviews (`/api/reviews`)
+| Method | Endpoint        | Description | Access |
+| ------ | --------------- | ----------- | ------ |
+| `GET`  | `/:targetId`    | Get reviews for a specific target | Public |
+| `POST` | `/`             | Add a new review to a book or shop | Protected |
+| `GET`  | `/me`           | Get logged-in user's posted reviews | Protected |
+| `PUT`  | `/:id`          | Update a review | Protected |
+| `DELETE`| `/:id`         | Delete a review | Protected |
+
+### 📝 Blogs (`/api/blogs`)
+| Method | Endpoint          | Description | Access |
+| ------ | ----------------- | ----------- | ------ |
+| `GET`  | `/`               | Get all blogs | Public |
+| `POST` | `/`               | Create a new blog post | Protected |
+| `GET`  | `/:id`            | Get specific blog | Public |
+| `PUT`  | `/:id`            | Update an existing blog | Protected |
+| `DELETE`| `/:id`           | Delete an existing blog | Protected |
+| `POST` | `/:id/like`       | Toggle "like" status | Protected |
+| `GET`  | `/:id/comments`   | Fetch all comments attached to a blog | Public |
+| `POST` | `/:id/comments`   | Create a new comment onto a blog | Protected |
+
+### 📊 Reports (`/api/reports`)
+| Method | Endpoint | Description | Access |
+| ------ | -------- | ----------- | ------ |
+| `GET`  | `/`      | Generate or retrieve reports | Protected |
+| `POST` | `/`      | Submit a report payload | Protected |
 
 > Review photo uploads use `multipart/form-data` with the field name `image`. Images are stored in Cloudinary under the `poth_uploads` folder.
 
