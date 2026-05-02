@@ -46,7 +46,7 @@ export default function OwnerDashboard() {
 
   const dashboardStats = [
     { label: 'TOTAL SHOPS', value: shops.length.toString().padStart(2, '0'), change: 'Keep it up!', color: '#003D71' },
-    { label: 'ACTIVE ALERTS', value: '01', change: 'Requires your attention', color: '#E74C3C' },
+    { label: 'COMPLETED ORDERS', value: '15', change: 'Great job!', color: '#2ecc71' },
     { label: 'LOW STOCK ITEMS', value: '00', progress: 0.1, color: '#F1C40F' },
   ];
 
