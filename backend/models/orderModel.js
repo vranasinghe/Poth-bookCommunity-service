@@ -29,7 +29,7 @@ const orderSchema = new mongoose.Schema({
     deliveryDetails: {
         address: { type: String, required: [true, 'Please add delivery address'] },
         city: { type: String, required: [true, 'Please add delivery city'] },
-        phone: { type: String, required: [true, 'Please add delivery phone number'] }
+        phone: { type: String, required: [true, 'Please add delivery phone number'], minlength: [10, 'Phone number should only contain 10 characters'], maxlength: [10, 'Phone number should only contain 10 characters'] }
     },
     status: {
         type: String,
