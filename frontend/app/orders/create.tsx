@@ -12,7 +12,7 @@ export default function CreateOrderScreen() {
     const { user } = useContext(AuthContext);
     const router = useRouter();
     const params = useLocalSearchParams();
-    
+
     const bookId = (Array.isArray(params.bookId) ? params.bookId[0] : params.bookId) || "64a2b9f0d11c7b8c8d839222";
     const shopId = (Array.isArray(params.shopId) ? params.shopId[0] : params.shopId) || "64a2b9f0d11c7b8c8d839211";
     const [bookDetails, setBookDetails] = useState<any>(null);
@@ -58,7 +58,7 @@ export default function CreateOrderScreen() {
         }
 
         const pricePerItem = bookDetails ? bookDetails.price : 2000;
-        
+
         const formData = new FormData();
         formData.append('reader', user?._id || '');
         formData.append('shop', shopId);
@@ -66,7 +66,7 @@ export default function CreateOrderScreen() {
         formData.append('quantity', quantity);
         formData.append('totalPrice', String(Number(quantity) * pricePerItem));
         formData.append('deliveryDetails', JSON.stringify({ address, city, phone }));
-        
+
         if (image) {
             if (Platform.OS === 'web') {
                 const response = await fetch(image.uri);
@@ -77,7 +77,7 @@ export default function CreateOrderScreen() {
                 const name = uri.split('/').pop();
                 const match = /\.(\w+)$/.exec(name || '');
                 const type = match ? `image/${match[1]}` : `image`;
-                
+
                 // @ts-ignore
                 formData.append('paymentSlip', {
                     uri: Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
@@ -123,39 +123,39 @@ export default function CreateOrderScreen() {
 
                 <Text style={styles.label}>Quantity</Text>
                 <View style={styles.qtyContainer}>
-                    <TouchableOpacity 
-                        style={styles.qtyBtn} 
+                    <TouchableOpacity
+                        style={styles.qtyBtn}
                         onPress={() => setQuantity(String(Math.max(1, Number(quantity) - 1)))}>
                         <Ionicons name="remove" size={20} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.qtyText}>{quantity}</Text>
-                    <TouchableOpacity 
-                        style={styles.qtyBtn} 
+                    <TouchableOpacity
+                        style={styles.qtyBtn}
                         onPress={() => setQuantity(String(Number(quantity) + 1))}>
                         <Ionicons name="add" size={20} color="#fff" />
                     </TouchableOpacity>
                 </View>
 
                 <Text style={styles.headerTitle}>Delivery Details</Text>
-                
-                <TextInput 
-                    style={styles.input} 
-                    placeholder="Address" 
-                    value={address} 
-                    onChangeText={setAddress} 
+
+                <TextInput
+                    style={styles.input}
+                    placeholder="Address"
+                    value={address}
+                    onChangeText={setAddress}
                 />
-                <TextInput 
-                    style={styles.input} 
-                    placeholder="City" 
-                    value={city} 
-                    onChangeText={setCity} 
+                <TextInput
+                    style={styles.input}
+                    placeholder="City"
+                    value={city}
+                    onChangeText={setCity}
                 />
-                <TextInput 
-                    style={styles.input} 
-                    placeholder="Phone Number" 
-                    value={phone} 
+                <TextInput
+                    style={styles.input}
+                    placeholder="Phone Number"
+                    value={phone}
                     keyboardType="phone-pad"
-                    onChangeText={setPhone} 
+                    onChangeText={setPhone}
                 />
 
                 <Text style={styles.headerTitle}>Payment Slip</Text>
