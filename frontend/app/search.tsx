@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../constants/theme';
+import { useTheme } from '../src/theme/ThemeContext';
 import { getBooksAPI } from '../src/api/bookApi';
 import { getShopsAPI } from '../src/api/shopApi';
 import { BookCard } from '../components/BookCard';
@@ -10,6 +10,7 @@ import { BookCard } from '../components/BookCard';
 export default function SearchScreen() {
   const router = useRouter();
   const { q } = useLocalSearchParams();
+  const theme = useTheme();
   const [searchQuery, setSearchQuery] = useState((q as string) || '');
   const [loading, setLoading] = useState(true);
   const [books, setBooks] = useState<any[]>([]);
@@ -114,7 +115,7 @@ export default function SearchScreen() {
 
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={Colors.light.primary} />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : (
         <ScrollView style={styles.resultsContainer}>

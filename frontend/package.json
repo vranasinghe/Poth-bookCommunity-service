@@ -3,12 +3,12 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --port 8080",
+    "start": "node ./scripts/copy-logo.js && expo start --port 8080",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web --port 8080",
-    "build": "expo export --platform web",
+    "web": "node ./scripts/copy-logo.js && expo start --web --port 8080",
+    "build": "node ./scripts/copy-logo.js && expo export --platform web",
     "lint": "expo lint"
   },
   "dependencies": {

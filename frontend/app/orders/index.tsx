@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView, ActivityIndicator, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../../src/context/AuthContext';
 import { getReaderOrdersAPI, deleteOrderAPI } from '../../src/api/orderApi';
@@ -9,6 +9,7 @@ import { getReaderOrdersAPI, deleteOrderAPI } from '../../src/api/orderApi';
 export default function OrdersScreen() {
     const { user } = useContext(AuthContext);
     const router = useRouter();
+    const theme = useTheme();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -66,7 +67,7 @@ export default function OrdersScreen() {
             case 'Shipped': return '#2196F3'; // Blue
             case 'Delivered': return '#9C27B0'; // Purple
             case 'Cancelled': return '#F44336'; // Red
-            default: return Colors.light.primary;
+            default: return theme.colors.primary;
         }
     };
 
@@ -108,7 +109,7 @@ export default function OrdersScreen() {
             </View>
 
             {loading ? (
-                <ActivityIndicator size="large" color={Colors.light.primary} style={{ marginTop: 50 }} />
+                <ActivityIndicator size="large" color={theme.colors.primary} style={{ marginTop: 50 }} />
             ) : (
                 <FlatList
                     data={orders}
@@ -123,7 +124,7 @@ export default function OrdersScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f9f9f9' },
+    container: { flex: 1, backgroundColor: '#F0F4F8' },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderColor: '#eee' },
     title: { fontSize: 20, fontWeight: 'bold' },
     backBtn: { padding: 5 },

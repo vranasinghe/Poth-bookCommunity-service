@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Dimensions, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Dimensions, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../constants/theme';
+import { useTheme } from '../src/theme/ThemeContext';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { loginUserAPI, registerUserAPI } from '../src/api/userApi';
@@ -27,6 +27,8 @@ export default function AuthScreen() {
 
   const router = useRouter();
   const { loginContext } = useContext(AuthContext);
+  const theme = useTheme();
+  const styles = createStyles(theme);
 
   const handleAuth = async () => {
     if (isLogin) {
@@ -87,9 +89,11 @@ export default function AuthScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.header}>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoText}>poth</Text>
-            </View>
+            <Image 
+              source={require('../assets/images/logo.png')} 
+              style={styles.logo}
+              resizeMode="contain"
+            />
             <Text style={styles.welcomeTitle}>{isLogin ? 'Welcome back' : 'Join the library'}</Text>
             <Text style={styles.welcomeSub}>
               {isLogin ? 'Continue your curated journey.' : 'Start your literary adventure with us.'}
@@ -192,7 +196,7 @@ export default function AuthScreen() {
                     <Ionicons name="logo-google" size={24} color="#EA4335" />
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.socialButton}>
-                    <Ionicons name="logo-apple" size={24} color="#000000" />
+                    <Ionicons name="logo-apple" size={24} color={theme.colors.textPrimary} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -214,49 +218,44 @@ export default function AuthScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.background,
   },
   container: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 30,
-    paddingTop: 40,
-    paddingBottom: 40,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.xl,
+    paddingBottom: theme.spacing.xl,
     justifyContent: 'center',
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: theme.spacing.xl,
   },
-  logoBox: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#000000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 0,
-    marginBottom: 30,
-  },
-  logoText: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'normal',
+  logo: {
+    width: 120,
+    height: 120,
+    borderRadius: theme.radii.lg,
+    marginBottom: theme.spacing.md,
   },
   welcomeTitle: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: Colors.light.primary,
-    marginBottom: 10,
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.h1.fontSize,
+    fontWeight: theme.typography.scale.h1.fontWeight,
+    lineHeight: theme.typography.scale.h1.lineHeight,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.xs,
     textAlign: 'center',
   },
   welcomeSub: {
-    fontSize: 18,
-    color: '#666',
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.body.fontSize,
+    color: theme.colors.textSecondary,
     fontStyle: 'italic',
     textAlign: 'center',
   },
@@ -266,73 +265,74 @@ const styles = StyleSheet.create({
   userTypeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
-    padding: 5
+    marginBottom: theme.spacing.md,
+    backgroundColor: theme.colors.surfaceMuted,
+    borderRadius: theme.radii.sm,
+    padding: theme.spacing.xs,
   },
   userTypeButton: {
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
-    borderRadius: 10
+    borderRadius: theme.radii.sm - 2,
   },
   userTypeActive: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2
+    backgroundColor: theme.colors.surface,
+    ...theme.shadows.subtle,
   },
   userTypeText: {
+    fontFamily: theme.typography.fontFamily,
     fontWeight: '600',
-    color: '#999'
+    color: theme.colors.textMuted,
   },
   userTypeTextActive: {
-    color: Colors.light.primary
+    color: theme.colors.primary,
   },
   forgotPass: {
     alignSelf: 'flex-end',
-    marginBottom: 24,
+    marginBottom: theme.spacing.lg,
   },
   forgotPassText: {
-    fontSize: 12,
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.caption.fontSize,
     fontWeight: '700',
-    color: Colors.light.primary,
+    color: theme.colors.primary,
   },
   mainButton: {
-    marginBottom: 40,
+    marginBottom: theme.spacing.xl,
   },
   dividerBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: theme.spacing.lg,
   },
   divider: {
     flex: 1,
     height: 1,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: theme.colors.border,
   },
   dividerText: {
     paddingHorizontal: 15,
-    fontSize: 12,
-    color: '#999',
-    fontWeight: '500',
-    letterSpacing: 2,
+    fontSize: 11,
+    color: theme.colors.textMuted,
+    fontWeight: '600',
+    letterSpacing: 1.5,
   },
   socialRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 20,
-    marginBottom: 40,
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.xl,
   },
   socialButton: {
-    width: width * 0.35,
+    width: width * 0.38,
     height: 56,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 16,
+    backgroundColor: theme.colors.surfaceMuted,
+    borderRadius: theme.radii.md,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   footer: {
     flexDirection: 'row',
@@ -340,12 +340,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footerText: {
-    fontSize: 16,
-    color: '#666',
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.bodySmall.fontSize,
+    color: theme.colors.textSecondary,
   },
   toggleText: {
-    fontSize: 16,
-    color: Colors.light.primary,
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.bodySmall.fontSize,
+    color: theme.colors.primary,
     fontWeight: 'bold',
   },
 });

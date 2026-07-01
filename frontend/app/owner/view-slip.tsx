@@ -2,11 +2,12 @@ import React from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, SafeAreaView, Text } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 
 export default function ViewSlipScreen() {
     const { url } = useLocalSearchParams();
     const router = useRouter();
+    const theme = useTheme();
 
     return (
         <SafeAreaView style={styles.container}>

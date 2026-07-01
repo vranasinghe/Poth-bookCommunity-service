@@ -16,7 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { AuthContext } from '../../src/context/AuthContext';
 import { createShopAPI } from '../../src/api/shopApi';
 import { Button } from '../../components/Button';
@@ -24,6 +24,7 @@ import { Button } from '../../components/Button';
 export default function RegisterShopScreen() {
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const theme = useTheme();
 
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState<string | null>(null);

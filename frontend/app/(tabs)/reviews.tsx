@@ -13,13 +13,14 @@ import {
   TextInput,
   Modal
 } from 'react-native';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../../src/context/AuthContext';
 import { getMyReviewsAPI, updateReviewAPI, deleteReviewAPI } from '../../src/api/reviewApi';
 
 export default function ReviewsScreen() {
   const { user } = useContext(AuthContext);
+  const theme = useTheme();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -132,7 +133,7 @@ export default function ReviewsScreen() {
         </View>
         <View style={styles.actionRow}>
           <TouchableOpacity onPress={() => handleEdit(item)} style={styles.iconBtn}>
-            <Ionicons name="create-outline" size={20} color={Colors.light.primary} />
+            <Ionicons name="create-outline" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleDelete(item._id)} style={styles.iconBtn}>
             <Ionicons name="trash-outline" size={20} color="#E74C3C" />
@@ -149,7 +150,7 @@ export default function ReviewsScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.centered}>
-        <ActivityIndicator size="large" color={Colors.light.primary} />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </SafeAreaView>
     );
   }
@@ -170,8 +171,8 @@ export default function ReviewsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[Colors.light.primary]}
-            tintColor={Colors.light.primary}
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
           />
         }
         ListEmptyComponent={
@@ -226,7 +227,7 @@ export default function ReviewsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#F0F4F8',
   },
   centered: {
     flex: 1,
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '900',
-    color: Colors.light.primary,
+    color: '#0F3D63',
     marginBottom: 5,
   },
   subtitle: {
@@ -360,7 +361,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   saveBtn: {
-    backgroundColor: Colors.light.primary,
+    backgroundColor: '#0F3D63',
     paddingVertical: 18,
     borderRadius: 15,
     alignItems: 'center',

@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { getBooksAPI } from '../../src/api/bookApi';
 import { BookCard } from '../../components/BookCard';
 
 export default function DiscoverBooks() {
   const router = useRouter();
+  const theme = useTheme();
   const [books, setBooks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -44,7 +45,7 @@ export default function DiscoverBooks() {
 
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={Colors.light.primary} />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : (
         <FlatList
@@ -67,8 +68,8 @@ export default function DiscoverBooks() {
             <RefreshControl 
               refreshing={refreshing} 
               onRefresh={onRefresh} 
-              colors={[Colors.light.primary]} 
-              tintColor={Colors.light.primary} 
+              colors={[theme.colors.primary]} 
+              tintColor={theme.colors.primary} 
             />
           }
           ListEmptyComponent={
@@ -85,7 +86,7 @@ export default function DiscoverBooks() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F0F4F8',
   },
   header: {
     flexDirection: 'row',

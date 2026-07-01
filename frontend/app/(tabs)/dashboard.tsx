@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, SafeAreaView, Image, ActivityIndicator, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { BookCard } from '../../components/BookCard';
 import { AuthContext } from '../../src/context/AuthContext';
 import { getBooksAPI } from '../../src/api/bookApi';
@@ -17,6 +17,9 @@ export default function CustomerDashboard() {
   const [books, setBooks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const theme = useTheme();
+  const styles = createStyles(theme);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -59,7 +62,7 @@ export default function CustomerDashboard() {
             <TextInput 
               placeholder="Search books/shops" 
               style={styles.searchInput}
-              placeholderTextColor="#999"
+              placeholderTextColor={theme.colors.textMuted}
               value={searchQuery}
               onChangeText={setSearchQuery}
               onSubmitEditing={handleSearch}
@@ -67,7 +70,7 @@ export default function CustomerDashboard() {
             />
             <View style={styles.verticalDivider} />
             <TouchableOpacity style={styles.filterButton} onPress={handleSearch}>
-              <Ionicons name="search-outline" size={24} color={Colors.light.primary} />
+              <Ionicons name="search-outline" size={24} color={theme.colors.primary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -75,21 +78,21 @@ export default function CustomerDashboard() {
         {/* Discovery Buttons */}
         <View style={styles.discoveryRow}>
           <TouchableOpacity 
-            style={[styles.discoveryCard, { backgroundColor: '#E3F2FD' }]}
+            style={[styles.discoveryCard, { backgroundColor: theme.colors.pastelBlue }]}
             onPress={() => router.push('/discover/books' as any)}
           >
             <View style={styles.iconCircle}>
-              <Ionicons name="book" size={24} color="#1976D2" />
+              <Ionicons name="book" size={24} color={theme.colors.primary} />
             </View>
             <Text style={styles.discoveryTitle}>Discover books</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.discoveryCard, { backgroundColor: '#F3E5F5' }]}
+            style={[styles.discoveryCard, { backgroundColor: theme.colors.pastelLavender }]}
             onPress={() => router.push('/discover/shops' as any)}
           >
             <View style={styles.iconCircle}>
-              <Ionicons name="storefront" size={24} color="#7B1FA2" />
+              <Ionicons name="storefront" size={24} color={theme.colors.secondary} />
             </View>
             <Text style={styles.discoveryTitle}>Discover Shops</Text>
           </TouchableOpacity>
@@ -129,7 +132,7 @@ export default function CustomerDashboard() {
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.booksGrid}>
           {loading ? (
-             <ActivityIndicator size="large" color={Colors.light.primary} style={{ margin: 20 }} />
+             <ActivityIndicator size="large" color={theme.colors.primary} style={{ margin: 20 }} />
           ) : (
              books.map(book => (
                <BookCard 
@@ -149,67 +152,66 @@ export default function CustomerDashboard() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.background,
   },
   container: {
-    paddingTop: 20,
-    paddingBottom: 40,
+    paddingTop: theme.spacing.md,
+    paddingBottom: theme.spacing.xxl,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 25,
-    marginBottom: 30,
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
   },
   greeting: {
-    fontSize: 28,
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.h2.fontSize,
     fontWeight: '900',
-    color: '#1A1A1A',
+    color: theme.colors.textPrimary,
   },
   subGreeting: {
-    fontSize: 16,
-    color: '#666',
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.bodySmall.fontSize,
+    color: theme.colors.textSecondary,
     marginTop: 4,
   },
   avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     borderWidth: 2,
-    borderColor: '#EEEEEE',
+    borderColor: theme.colors.border,
   },
   searchSection: {
-    paddingHorizontal: 25,
-    marginBottom: 30,
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radii.md,
     paddingHorizontal: 20,
-    height: 64,
+    height: 56,
     borderWidth: 1,
-    borderColor: '#EEEEEE',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    borderColor: theme.colors.border,
+    ...theme.shadows.subtle,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    color: '#1A1A1A',
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.body.fontSize,
+    color: theme.colors.textPrimary,
   },
   verticalDivider: {
     width: 1,
-    height: 24,
-    backgroundColor: '#EEEEEE',
+    height: 20,
+    backgroundColor: theme.colors.border,
     marginHorizontal: 15,
   },
   filterButton: {
@@ -217,77 +219,77 @@ const styles = StyleSheet.create({
   },
   discoveryRow: {
     flexDirection: 'row',
-    paddingHorizontal: 25,
+    paddingHorizontal: theme.spacing.lg,
     justifyContent: 'space-between',
-    marginBottom: 30,
+    marginBottom: theme.spacing.xl,
   },
   discoveryCard: {
-    width: (width - 60) / 2,
+    width: (width - (theme.spacing.lg * 2) - theme.spacing.md) / 2,
     padding: 20,
-    borderRadius: 24,
+    borderRadius: theme.radii.md,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 1,
+    ...theme.shadows.subtle,
   },
   iconCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#FFFFFF',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: theme.colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
   discoveryTitle: {
-    fontSize: 14,
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.bodySmall.fontSize,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: theme.colors.textPrimary,
   },
   categorySection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 25,
-    marginBottom: 20,
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.h3.fontSize,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
   },
   viewAll: {
-    fontSize: 14,
-    color: '#666',
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.bodySmall.fontSize,
+    color: theme.colors.textSecondary,
     fontWeight: '500',
   },
   categoryScroll: {
-    paddingLeft: 25,
-    marginBottom: 30,
+    paddingLeft: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
   },
   categoryChip: {
     paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 16,
-    backgroundColor: '#F7F7F7',
+    borderRadius: theme.radii.sm,
+    backgroundColor: theme.colors.surfaceMuted,
     marginRight: 10,
   },
   categoryChipActive: {
-    backgroundColor: '#2D3436',
+    backgroundColor: theme.colors.primary,
   },
   categoryText: {
-    fontSize: 14,
-    color: '#999',
+    fontFamily: theme.typography.fontFamily,
+    fontSize: theme.typography.scale.bodySmall.fontSize,
+    color: theme.colors.textMuted,
     fontWeight: '600',
   },
   categoryTextActive: {
-    color: '#FFFFFF',
+    color: theme.colors.surface,
   },
   booksGrid: {
-    paddingLeft: 25,
+    paddingLeft: theme.spacing.lg,
     paddingRight: 5,
   },
 });

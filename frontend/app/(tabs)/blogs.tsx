@@ -8,7 +8,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { getBlogs, deleteBlog } from '../../src/api/blogApi';
 import { useAuth } from '../../src/context/AuthContext';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 
 // const { width } = Dimensions.get('window');
 const IMAGE_BASE = 'http://10.0.2.2:5001/uploads/';
@@ -27,6 +27,7 @@ interface Blog {
 export default function BlogsScreen() {
     const router = useRouter();
     const { user, isShopOwner } = useAuth();
+    const theme = useTheme();
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -142,7 +143,7 @@ export default function BlogsScreen() {
 
             {loading && !refreshing ? (
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={Colors.light.primary} />
+                    <ActivityIndicator size="large" color={theme.colors.primary} />
                     <Text style={styles.loadingText}>Fetching stories...</Text>
                 </View>
             ) : (
@@ -153,7 +154,7 @@ export default function BlogsScreen() {
                     contentContainerStyle={styles.listContainer}
                     showsVerticalScrollIndicator={false}
                     refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.light.primary} />
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
                     }
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>
@@ -173,7 +174,7 @@ export default function BlogsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F8F9FB',
+        backgroundColor: '#F0F4F8',
     },
     header: {
         flexDirection: 'row',
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: '900',
-        color: Colors.light.primary,
+        color: '#0F3D63',
         letterSpacing: -0.5,
     },
     headerSubtitle: {
@@ -197,14 +198,14 @@ const styles = StyleSheet.create({
         marginTop: -2,
     },
     createBtn: {
-        backgroundColor: Colors.light.primary,
+        backgroundColor: '#0F3D63',
         width: 48,
         height: 48,
         borderRadius: 24,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 4,
-        shadowColor: Colors.light.primary,
+        shadowColor: '#0F3D63',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 5,
@@ -298,7 +299,7 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     editBtn: {
-        backgroundColor: '#E3F2FD',
+        backgroundColor: '#EAF4FB',
     },
     deleteBtn: {
         backgroundColor: '#FFEBEE',

@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, SafeAreaView, ScrollView, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../../src/context/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,6 +12,7 @@ export default function CreateOrderScreen() {
     const { user } = useContext(AuthContext);
     const router = useRouter();
     const params = useLocalSearchParams();
+    const theme = useTheme();
 
     const bookId = (Array.isArray(params.bookId) ? params.bookId[0] : params.bookId) || "64a2b9f0d11c7b8c8d839222";
     const shopId = (Array.isArray(params.shopId) ? params.shopId[0] : params.shopId) || "64a2b9f0d11c7b8c8d839211";
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
     mockItem: { color: '#333', fontSize: 14 },
     label: { fontSize: 16, fontWeight: 'bold', marginBottom: 10, color: '#333' },
     qtyContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 30 },
-    qtyBtn: { backgroundColor: Colors.light.primary, padding: 10, borderRadius: 8 },
+    qtyBtn: { backgroundColor: '#0F3D63', padding: 10, borderRadius: 8 },
     qtyText: { fontSize: 20, fontWeight: 'bold', marginHorizontal: 20 },
     headerTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15, color: '#333' },
     input: { backgroundColor: '#f5f5f5', padding: 15, borderRadius: 10, marginBottom: 15, fontSize: 16 },
@@ -198,6 +199,6 @@ const styles = StyleSheet.create({
     imageBtnText: { marginLeft: 10, color: '#666', fontSize: 16 },
     previewContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, backgroundColor: '#e8f5e9', padding: 10, borderRadius: 8 },
     previewText: { marginLeft: 10, color: '#2e7d32', fontWeight: '500' },
-    submitBtn: { backgroundColor: Colors.light.primary, padding: 18, borderRadius: 10, alignItems: 'center', marginTop: 10 },
+    submitBtn: { backgroundColor: '#0F3D63', padding: 18, borderRadius: 10, alignItems: 'center', marginTop: 10 },
     submitBtnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' }
 });

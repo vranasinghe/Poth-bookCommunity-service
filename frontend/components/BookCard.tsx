@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { useTheme } from '../src/theme/ThemeContext';
 
 interface BookCardProps {
   id?: string;
@@ -14,24 +15,30 @@ interface BookCardProps {
 }
 
 export const BookCard = ({ id, title, author, rating, image, onPress, width = 200 }: BookCardProps) => {
+  const theme = useTheme();
+
   return (
-    <TouchableOpacity style={[styles.container, { width }]} onPress={onPress}>
-      <ImageBackground source={{ uri: image }} style={styles.image} imageStyle={styles.imageStyle}>
+    <TouchableOpacity
+      style={[styles.container, { width, borderRadius: theme.radii.lg, ...theme.shadows.medium }]}
+      onPress={onPress}
+      activeOpacity={0.9}
+    >
+      <ImageBackground source={{ uri: image }} style={styles.image} imageStyle={{ borderRadius: theme.radii.lg }}>
         <TouchableOpacity style={styles.heartButton}>
           <Ionicons name="heart-outline" size={20} color="white" />
         </TouchableOpacity>
-        
-        <View style={styles.infoContainer}>
-            <BlurView intensity={30} style={styles.blurOverlay} tint="dark">
-                <Text style={styles.title} numberOfLines={1}>{title}</Text>
-                <View style={styles.authorRow}>
-                    <Text style={styles.author} numberOfLines={1}>{author}</Text>
-                    <View style={styles.ratingRow}>
-                        <Ionicons name="star" size={14} color="#FFC107" />
-                        <Text style={styles.rating}>{rating}</Text>
-                    </View>
-                </View>
-            </BlurView>
+
+        <View style={[styles.infoContainer, { borderRadius: theme.radii.md }]}>
+          <BlurView intensity={30} style={styles.blurOverlay} tint="dark">
+            <Text style={styles.title} numberOfLines={1}>{title}</Text>
+            <View style={styles.authorRow}>
+              <Text style={styles.author} numberOfLines={1}>{author}</Text>
+              <View style={styles.ratingRow}>
+                <Ionicons name="star" size={14} color={theme.colors.accent} />
+                <Text style={[styles.rating, { color: theme.colors.accent }]}>{rating}</Text>
+              </View>
+            </View>
+          </BlurView>
         </View>
       </ImageBackground>
     </TouchableOpacity>
@@ -42,21 +49,12 @@ const styles = StyleSheet.create({
   container: {
     height: 300,
     marginRight: 20,
-    borderRadius: 24,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 15,
-    elevation: 8,
   },
   image: {
     flex: 1,
     padding: 15,
     justifyContent: 'space-between',
-  },
-  imageStyle: {
-    borderRadius: 24,
   },
   heartButton: {
     alignSelf: 'flex-end',
@@ -68,7 +66,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   infoContainer: {
-    borderRadius: 16,
     overflow: 'hidden',
   },
   blurOverlay: {
@@ -87,7 +84,7 @@ const styles = StyleSheet.create({
   },
   author: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.85)',
     flex: 1,
     marginRight: 8,
   },
@@ -97,7 +94,6 @@ const styles = StyleSheet.create({
   },
   rating: {
     fontSize: 12,
-    color: '#FFC107',
     fontWeight: 'bold',
     marginLeft: 4,
   },

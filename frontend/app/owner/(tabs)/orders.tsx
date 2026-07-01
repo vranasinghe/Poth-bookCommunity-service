@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView, ActivityIndicator, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Colors } from '../../../constants/theme';
+import { useTheme } from '../../../src/theme/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { getShopOrdersAPI, updateOrderStatusAPI, deleteOrderAPI } from '../../../src/api/orderApi';
 import { AuthContext } from '../../../src/context/AuthContext';
@@ -10,6 +10,7 @@ import { getShopsAPI } from '../../../src/api/shopApi';
 export default function ShopOwnerOrdersScreen() {
     const { user } = useContext(AuthContext);
     const router = useRouter();
+    const theme = useTheme();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -105,7 +106,7 @@ export default function ShopOwnerOrdersScreen() {
         <View style={styles.card}>
             <View style={styles.cardHeader}>
                 <Text style={styles.orderId}>Order #{item._id.slice(-6).toUpperCase()}</Text>
-                <View style={[styles.statusBadge, { backgroundColor: item.status === 'Pending' ? '#FFC107' : item.status === 'Cancelled' ? '#F44336' : Colors.light.primary }]}>
+                <View style={[styles.statusBadge, { backgroundColor: item.status === 'Pending' ? '#FFC107' : item.status === 'Cancelled' ? '#F44336' : theme.colors.primary }]}>
                     <Text style={styles.statusText}>{item.status}</Text>
                 </View>
             </View>
@@ -130,7 +131,7 @@ export default function ShopOwnerOrdersScreen() {
                                 ]);
                             }
                         }}>
-                        <Text style={styles.viewSlipText}>View Attached Slip</Text>
+                        <Text style={[styles.viewSlipText, { color: theme.colors.primary }]}>View Attached Slip</Text>
                     </TouchableOpacity>
                 </View>
             )}
@@ -173,7 +174,7 @@ export default function ShopOwnerOrdersScreen() {
             </View>
 
             {loading ? (
-                <ActivityIndicator size="large" color={Colors.light.primary} style={{ marginTop: 50 }} />
+                <ActivityIndicator size="large" color={theme.colors.primary} style={{ marginTop: 50 }} />
             ) : (
                 <FlatList
                     data={orders}
@@ -188,7 +189,7 @@ export default function ShopOwnerOrdersScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f9f9f9' },
+    container: { flex: 1, backgroundColor: '#FAF6F1' },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderColor: '#eee' },
     title: { fontSize: 20, fontWeight: 'bold' },
     backBtn: { padding: 5 },
@@ -202,7 +203,7 @@ const styles = StyleSheet.create({
     detailsText: { fontSize: 14, color: '#444', marginBottom: 5 },
     slipContainer: { marginTop: 10, padding: 10, backgroundColor: '#f0f4f8', borderRadius: 8, flexDirection: 'row', alignItems: 'center' },
     slipLabel: { fontSize: 14, fontWeight: 'bold', color: '#555', marginRight: 10 },
-    viewSlipText: { fontSize: 14, color: Colors.light.primary, fontWeight: '600', textDecorationLine: 'underline' },
+    viewSlipText: { fontSize: 14, fontWeight: '600', textDecorationLine: 'underline' },
     actions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 15 },
     btn: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8 },
     btnText: { color: 'white', fontWeight: 'bold' }

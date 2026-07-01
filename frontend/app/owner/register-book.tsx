@@ -16,7 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { AuthContext } from '../../src/context/AuthContext';
 import { createBookAPI } from '../../src/api/bookApi';
 import { getShopsByOwnerAPI } from '../../src/api/shopApi';
@@ -26,6 +26,7 @@ import { Picker } from '@react-native-picker/picker';
 export default function RegisterBookScreen() {
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const theme = useTheme();
 
   const [loading, setLoading] = useState(false);
   const [shopsLoading, setShopsLoading] = useState(true);
@@ -127,7 +128,7 @@ export default function RegisterBookScreen() {
   if (shopsLoading) {
       return (
           <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-              <ActivityIndicator size="large" color={Colors.light.primary} />
+              <ActivityIndicator size="large" color={theme.colors.primary} />
           </View>
       );
   }

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { getShopsAPI } from '../../src/api/shopApi';
 
 export default function DiscoverShops() {
   const router = useRouter();
+  const theme = useTheme();
   const [shops, setShops] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -65,7 +66,7 @@ export default function DiscoverShops() {
 
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={Colors.light.primary} />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : (
         <FlatList
@@ -77,8 +78,8 @@ export default function DiscoverShops() {
             <RefreshControl 
               refreshing={refreshing} 
               onRefresh={onRefresh} 
-              colors={[Colors.light.primary]} 
-              tintColor={Colors.light.primary} 
+              colors={[theme.colors.primary]} 
+              tintColor={theme.colors.primary} 
             />
           }
           ListEmptyComponent={
@@ -95,7 +96,7 @@ export default function DiscoverShops() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F0F4F8',
   },
   header: {
     flexDirection: 'row',

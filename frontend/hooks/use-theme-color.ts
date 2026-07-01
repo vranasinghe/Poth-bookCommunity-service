@@ -1,21 +1,20 @@
 /**
- * Learn more about light and dark modes:
- * https://docs.expo.dev/guides/color-schemes/
+ * This hook is now a compatibility shim that delegates to the new ThemeContext.
+ * For new code, use `useTheme()` from `@/src/theme/ThemeContext` directly.
  */
 
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/src/theme/ThemeContext';
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light & keyof typeof Colors.dark
+  colorName: keyof ReturnType<typeof useTheme>['colors']
 ) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props[theme];
+  const theme = useTheme();
+  const colorFromProps = props['light']; // Single-theme app: always use light slot
 
   if (colorFromProps) {
     return colorFromProps;
   } else {
-    return Colors[theme][colorName];
+    return (theme.colors as any)[colorName] ?? '#000';
   }
 }

@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { AuthContext } from '../../src/context/AuthContext';
 import { getBookByIdAPI } from '../../src/api/bookApi';
 import { getReviewsAPI, addReviewAPI } from '../../src/api/reviewApi';
@@ -16,6 +16,7 @@ export default function BookDetailsScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const theme = useTheme();
 
   const [activeTab, setActiveTab] = useState('Overview');
   const [book, setBook] = useState<any>(null);
@@ -106,7 +107,7 @@ export default function BookDetailsScreen() {
   if (loading) {
       return (
           <View style={[styles.container, { justifyContent: 'center', alignItems: 'center'}]}>
-              <ActivityIndicator size="large" color={Colors.light.primary} />
+              <ActivityIndicator size="large" color={theme.colors.primary} />
           </View>
       );
   }
@@ -490,7 +491,7 @@ const styles = StyleSheet.create({
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: Colors.light.primary,
+      backgroundColor: '#0F3D63',
       justifyContent: 'center',
       alignItems: 'center'
   },

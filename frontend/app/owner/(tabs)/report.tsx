@@ -9,7 +9,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { AuthContext } from '../../../src/context/AuthContext';
 import { getShopsByOwnerAPI } from '../../../src/api/shopApi';
 import { previewReportAPI, createReportAPI } from '../../../src/api/reportApi';
-import { Colors } from '../../../constants/theme';
+import { useTheme } from '../../../src/theme/ThemeContext';
 
 interface SelectedImage {
     uri: string;
@@ -20,6 +20,7 @@ interface SelectedImage {
 export default function StockReportScreen() {
     const router = useRouter();
     const { user } = useContext<any>(AuthContext);
+    const theme = useTheme();
 
     const [shops, setShops] = useState<any[]>([]);
     const [selectedShopId, setSelectedShopId] = useState<string>('');
@@ -121,7 +122,7 @@ export default function StockReportScreen() {
     if (loadingShops) {
         return (
             <View style={styles.loaderContainer}>
-                <ActivityIndicator size="large" color={Colors.light.primary} />
+                <ActivityIndicator size="large" color={theme.colors.primary} />
             </View>
         );
     }
@@ -184,7 +185,7 @@ export default function StockReportScreen() {
 
                 <Text style={styles.label}>Stock Breakdown Preview</Text>
                 {loadingPreview ? (
-                    <ActivityIndicator size="small" color={Colors.light.primary} />
+                    <ActivityIndicator size="small" color={theme.colors.primary} />
                 ) : (
                     <View style={styles.previewBox}>
                         {previewData?.breakdown?.map((item: any, index: number) => (

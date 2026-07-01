@@ -2,13 +2,14 @@ import React, { useState, useCallback, useContext } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { AuthContext } from '../../src/context/AuthContext';
 import { getMyReportsAPI } from '../../src/api/reportApi';
 
 export default function AlertsScreen() {
   const { user } = useContext(AuthContext);
   const router = useRouter();
+  const theme = useTheme();
 
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +83,7 @@ export default function AlertsScreen() {
 
       {loading ? (
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.light.primary} />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : reports.length === 0 ? (
         <View style={styles.centerBox}>
@@ -106,7 +107,7 @@ export default function AlertsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#F0F4F8',
   },
   header: {
     padding: 20,
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#003D71',
+    color: '#0F3D63',
   },
   headerSubtitle: {
     fontSize: 14,
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
   shopBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#003D71',
+    backgroundColor: '#0F3D63',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
@@ -202,11 +203,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   breakdownContainer: {
-    backgroundColor: '#F8F9FB',
+    backgroundColor: '#EAF4FB',
     padding: 12,
     borderRadius: 10,
     borderLeftWidth: 3,
-    borderLeftColor: '#003D71',
+    borderLeftColor: '#0F3D63',
     marginBottom: 15,
   },
   breakdownTitle: {

@@ -18,7 +18,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { Colors } from '../../constants/theme';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { AuthContext } from '../../src/context/AuthContext';
 import { getBooksByOwnerAPI, updateBookAPI, deleteBookAPI } from '../../src/api/bookApi';
 import { Button } from '../../components/Button';
@@ -26,6 +26,7 @@ import { Button } from '../../components/Button';
 export default function ManageStockScreen() {
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const theme = useTheme();
 
   const [loading, setLoading] = useState(true);
   const [books, setBooks] = useState<any[]>([]);
@@ -194,7 +195,7 @@ export default function ManageStockScreen() {
       </View>
 
       {loading && !refreshing ? (
-        <ActivityIndicator size="large" color={Colors.light.primary} style={{ marginTop: 50 }} />
+        <ActivityIndicator size="large" color={theme.colors.primary} style={{ marginTop: 50 }} />
       ) : books.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="book-outline" size={80} color="#DDD" />
